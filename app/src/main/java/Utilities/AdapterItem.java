@@ -61,10 +61,10 @@ public class AdapterItem extends BaseAdapter {
 
         ClaseListas dir = items.get(position);
 
-        TextView title = (TextView) v.findViewById(R.id.category);
+        TextView title = (TextView) v.findViewById(R.id.identificador);
         title.setText(dir.getTitle());
 
-        TextView description = (TextView) v.findViewById(R.id.texto);
+        TextView description = (TextView) v.findViewById(R.id.temperatura);
         description.setText(dir.getDescription());
 
         ImageView imagen = (ImageView) v.findViewById(R.id.imageView);

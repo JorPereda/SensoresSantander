@@ -36,15 +36,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*sensorAmbList = new ArrayList<>();
+        sensorAmbList = new ArrayList<>();
         lv = findViewById(R.id.list);
-
-        */
-
-        ArrayList<ClaseListas> adaptadorLista = new ArrayList<ClaseListas>();
-        ListView lv = (ListView) findViewById(R.id.list);
-        AdapterItem adapter = new AdapterItem(this, adaptadorLista);
-        lv.setAdapter(adapter);
 
         new GetSensoresAmbientales().execute();
     }
@@ -75,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     // looping through All sensors
                     for (int i = 0; i < sensores.length(); i++) {
                         JSONObject s = sensores.getJSONObject(i);
-                        //String id = s.getString("cd:identifier");
+                        String id = s.getString("dc:identifier");
                         String tipo = s.getString("ayto:type");
                         String ruido = s.getString("ayto:noise");
                         String luminosidad = s.getString("ayto:light");
@@ -90,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         HashMap<String, String> sensor = new HashMap<>();
 
                         // adding each child node to HashMap key => value
-                        //sensor.put("id", id);
+                        sensor.put("id", id);
                         sensor.put("tipo", tipo);
                         sensor.put("ruido", ruido);
                         sensor.put("luminosidad", luminosidad);
@@ -137,9 +130,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             ListAdapter adapter = new SimpleAdapter(MainActivity.this, sensorAmbList,
-                    R.layout.content_main, new String[]{ "identificador","temperatura"},
+                    R.layout.lista_personalizada, new String[]{"id","temperatura"},
                     new int[]{R.id.identificador, R.id.temperatura});
             lv.setAdapter(adapter);
+
+            /*ArrayList<ClaseListas> adaptadorLista = new ArrayList<>();
+            ListView lv = findViewById(R.id.list);
+            AdapterItem adapter = new AdapterItem(MainActivity.this, adaptadorLista);
+            lv.setAdapter(adapter);*/
         }
     }
 
