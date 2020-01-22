@@ -4,25 +4,28 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/identificador"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Identificador"
-        android:id="@+id/identificador"
-        android:textSize="21sp"
-        android:textColor="#f65034"
+        android:layout_alignBaseline="@id/IdLabel"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView" />
+        android:layout_toEndOf="@+id/IdLabel"
+        android:layout_toRightOf="@+id/IdLabel"
+        android:text="@string/id_text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#f65034"
+        android:textSize="21sp" />
 
     <TextView
+        android:id="@+id/temperatura"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Temperatura"
-        android:id="@+id/temperatura"
         android:layout_below="@+id/identificador"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView" />
+        android:layout_alignBaseline="@id/TempLabel"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="37dp"
+        android:layout_toRightOf="@+id/TempLabel"
+        android:text="@string/temp_text" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -36,8 +39,28 @@
         android:src="@mipmap/sensoricon"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignBottom="@+id/identificador"
         android:maxHeight="35dp"
         android:maxWidth="74dp"
         android:adjustViewBounds="true" />
+
+    <TextView
+        android:id="@+id/IdLabel"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/imageView"
+        android:layout_toRightOf="@+id/imageView"
+        android:text="@string/id_label"
+        android:textSize="21sp" />
+
+    <TextView
+        android:id="@+id/TempLabel"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/IdLabel"
+        android:layout_toEndOf="@+id/imageView"
+        android:layout_toRightOf="@+id/imageView"
+        android:text="@string/temp_label" />
 </RelativeLayout>

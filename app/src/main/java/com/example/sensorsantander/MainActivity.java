@@ -1,5 +1,6 @@
 package com.example.sensorsantander;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -8,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -20,8 +23,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import Utilities.AdapterItem;
-import Utilities.ClaseListas;
 import Utilities.HttpHandler;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +41,17 @@ public class MainActivity extends AppCompatActivity {
         lv = findViewById(R.id.list);
 
         new GetSensoresAmbientales().execute();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent detallesSensor = new Intent(view.getContext(), VistaDetallada.class);
+                HashMap<String, String> sensor = sensorAmbList.get(position);
+                detallesSensor.putExtra("map",sensor);
+                startActivity(detallesSensor);
+            }
+        });
+
     }
 
     private class GetSensoresAmbientales extends AsyncTask<Void, Void, Void> {
@@ -134,11 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     new int[]{R.id.identificador, R.id.temperatura});
             lv.setAdapter(adapter);
 
-            /*ArrayList<ClaseListas> adaptadorLista = new ArrayList<>();
-            ListView lv = findViewById(R.id.list);
-            AdapterItem adapter = new AdapterItem(MainActivity.this, adaptadorLista);
-            lv.setAdapter(adapter);*/
-        }
+         }
     }
 
     @Override

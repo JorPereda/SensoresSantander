@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">SensorSantander</string>
     <string name="action_settings">Settings</string>
+
+    <string name="id_text">Identificador</string>
+    <string name="temp_text">Temperatura</string>
+    <string name="id_label">Id:</string>
+    <string name="temp_label">Temp:</string>
+    <string name="id_detalle">Id:</string>
+    <string name="id_detalle_valor">Id del sensor</string>
+    <string name="temp_detalle">Temp:</string>
+    <string name="temp_detalle_valor">Temp del sensor</string>
+    <string name="noise_detalle">Ruido:</string>
+    <string name="noise_detalle_valor">Ruido del sensor</string>
+    <string name="light_detalle">Luminosidad:</string>
+    <string name="light_detalle_valor">Luminosidad del sensor</string>
 </resources>
