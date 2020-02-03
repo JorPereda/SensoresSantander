@@ -7,9 +7,17 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.HashMap;
 
-public class VistaDetallada extends AppCompatActivity {
+public class VistaDetallada extends AppCompatActivity
+        implements OnMapReadyCallback {
 
     HashMap<String, String> sensor;
 
@@ -19,6 +27,10 @@ public class VistaDetallada extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_detalle);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
         sensor = (HashMap<String, String>)intent.getSerializableExtra("map");
@@ -36,6 +48,14 @@ public class VistaDetallada extends AppCompatActivity {
 
         llenarCampos();
 
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+        googleMap.addMarker(new MarkerOptions().position(marcador)
+                .title("Sensor "+id));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(marcador));
     }
 
 
