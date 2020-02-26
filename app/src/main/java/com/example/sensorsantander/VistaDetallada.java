@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -55,7 +56,13 @@ public class VistaDetallada extends AppCompatActivity
         LatLng marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
         googleMap.addMarker(new MarkerOptions().position(marcador)
                 .title("Sensor "+id));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(marcador));
+
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(marcador)
+                .zoom(15)
+                .build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
 
