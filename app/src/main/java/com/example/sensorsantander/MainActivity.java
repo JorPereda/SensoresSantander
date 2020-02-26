@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Datos.LatLngBean;
 import Utilities.HttpHandler;
@@ -44,12 +45,8 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     private String TAG = MainActivity.class.getSimpleName();
 
-
-    HashMap<Marker,LatLngBean> hashMapMarker = new HashMap<Marker,LatLngBean>();
-
     ArrayList<HashMap<String, String>> sensorAmbList;
     private ListView lv;
-
 
 
     @Override
@@ -176,28 +173,28 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        String latitud;
-        String longitud;
-        List<LatLng> marcadores = new ArrayList<>();
-        MarkerOptions options = new MarkerOptions();
+        String latitud = "0";
+        String longitud = "0";
         LatLng marcadorInicial = new LatLng(43.46, -3.81);
-        marcadores.add(marcadorInicial);
-        for(HashMap<String, String> sensor : sensorAmbList) {
+        LatLng marcador = null;
+        googleMap.addMarker(new MarkerOptions().position(marcadorInicial).title("Inicial"));
+        for(HashMap<String, String> map : sensorAmbList) {
+            Log.d(TAG, "Probando log en el bucle externo");
+            for (Map.Entry<String, String> mapEntry : map.entrySet()){
+                latitud = mapEntry.getValue();
+                longitud = mapEntry.getValue();
+                Log.d(TAG, "Probando log en el bucle");
+                marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+            }
 
-            latitud = sensor.get("latitud");
-            longitud = sensor.get("longitud");
+            //latitud = sensor.get("latitud");
+            //longitud = sensor.get("longitud");
 
-            LatLng marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+            //LatLng marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
-            marcadores.add(marcador);
+            googleMap.addMarker(new MarkerOptions().position(marcador));
         }
-
-        for (LatLng point : marcadores) {
-            options.position(point);
-            options.title("someTitle");
-            options.snippet("someDesc");
-            googleMap.addMarker(options);
-        }
+        Log.d(TAG, "Probando log fuera del bucle");
 
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(marcadorInicial)
