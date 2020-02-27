@@ -179,18 +179,10 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         LatLng marcador = null;
         googleMap.addMarker(new MarkerOptions().position(marcadorInicial).title("Inicial"));
         for(HashMap<String, String> map : sensorAmbList) {
-            Log.d(TAG, "Probando log en el bucle externo");
-            for (Map.Entry<String, String> mapEntry : map.entrySet()){
-                latitud = mapEntry.getValue();
-                longitud = mapEntry.getValue();
-                Log.d(TAG, "Probando log en el bucle");
-                marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-            }
-
-            //latitud = sensor.get("latitud");
-            //longitud = sensor.get("longitud");
-
-            //LatLng marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+            Log.d(TAG, "Probando log en el bucle");
+            latitud = map.get("latitud");
+            longitud = map.get("longitud");
+            marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
             googleMap.addMarker(new MarkerOptions().position(marcador));
         }
