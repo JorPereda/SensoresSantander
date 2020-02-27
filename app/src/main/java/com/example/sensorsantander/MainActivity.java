@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import Datos.LatLngBean;
 import Utilities.HttpHandler;
@@ -60,7 +61,16 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         sensorAmbList = new ArrayList<>();
         lv = findViewById(R.id.list);
-        new GetSensoresAmbientales().execute();
+
+        //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
+        //crear los marcadores para el mapa.
+        try {
+            new GetSensoresAmbientales().execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
@@ -165,6 +175,8 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                     R.layout.lista_personalizada, new String[]{"id","temperatura"},
                     new int[]{R.id.identificador, R.id.temperatura});
             lv.setAdapter(adapter);
+
+
 
          }
     }
