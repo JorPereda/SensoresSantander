@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SensorSantander</string>
+    <string name="app_name">Sansor</string>
     <string name="action_settings">Settings</string>
 
     <string name="id_text">Identificador</string>
@@ -14,4 +14,7 @@
     <string name="noise_detalle_valor">Ruido del sensor</string>
     <string name="light_detalle">Luminosidad:</string>
     <string name="light_detalle_valor">Luminosidad del sensor</string>
+    <string name="todos">Todos</string>
+    <string name="weather">S. Atmosfericos</string>
+    <string name="noise">S. Ruido</string>
 </resources>

@@ -1,22 +1,15 @@
 package com.example.sensorsantander;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
+import android.widget.Toolbar;
+import android.app.ActionBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,8 +18,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -35,11 +26,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import Datos.LatLngBean;
 import Utilities.HttpHandler;
 
 public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback{
@@ -47,7 +35,9 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     private String TAG = MainActivity.class.getSimpleName();
 
     ArrayList<HashMap<String, String>> sensorAmbList;
-    private ListView lv;
+    ArrayList<HashMap<String, String>> sensoresBackup;
+
+    private GoogleMap map;
 
 
     @Override
@@ -55,12 +45,12 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         sensorAmbList = new ArrayList<>();
-        lv = findViewById(R.id.list);
 
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
@@ -72,7 +62,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             e.printStackTrace();
         }
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        /*lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent detallesSensor = new Intent(view.getContext(), VistaDetallada.class);
@@ -80,7 +70,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                 detallesSensor.putExtra("map",sensor);
                 startActivity(detallesSensor);
             }
-        });
+        });*/
 
     }
 
@@ -171,41 +161,103 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            ListAdapter adapter = new SimpleAdapter(MainActivity.this, sensorAmbList,
+            /*ListAdapter adapter = new SimpleAdapter(MainActivity.this, sensorAmbList,
                     R.layout.lista_personalizada, new String[]{"id","temperatura"},
                     new int[]{R.id.identificador, R.id.temperatura});
-            lv.setAdapter(adapter);
+            lv.setAdapter(adapter);*/
 
 
 
          }
     }
 
-
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        String latitud = "0";
-        String longitud = "0";
-        LatLng marcadorInicial = new LatLng(43.46, -3.81);
+    public void mapaTotal(GoogleMap googleMap){
+        String latitud, longitud, tipo, id;
         LatLng marcador = null;
-        googleMap.addMarker(new MarkerOptions().position(marcadorInicial).title("Inicial"));
+
         for(HashMap<String, String> map : sensorAmbList) {
-            Log.d(TAG, "Probando log en el bucle");
             latitud = map.get("latitud");
             longitud = map.get("longitud");
+            tipo = map.get("tipo");
+            id = map.get("id");
+
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
-            googleMap.addMarker(new MarkerOptions().position(marcador));
+            if(tipo.equals("WeatherObserved")){
+                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+            if(tipo.equals("NoiseLevelObserved")){
+                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+
         }
-        Log.d(TAG, "Probando log fuera del bucle");
 
         CameraPosition cameraPosition = CameraPosition.builder()
-                .target(marcadorInicial)
+                .target(marcador)
                 .zoom(15)
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    public void mapaWeather(GoogleMap googleMap){
+        googleMap.clear();
+        String latitud, longitud, tipo, id;
+        LatLng marcador = null;
+
+        for(HashMap<String, String> map : sensorAmbList) {
+            latitud = map.get("latitud");
+            longitud = map.get("longitud");
+            tipo = map.get("tipo");
+            id = map.get("id");
+
+            marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+
+            if(tipo.equals("WeatherObserved")){
+                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+
+        }
+
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(marcador)
+                .zoom(15)
+                .build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    public void mapaRuido(GoogleMap googleMap){
+        googleMap.clear();
+        String latitud, longitud, tipo, id;
+        LatLng marcador = null;
+
+        for(HashMap<String, String> map : sensorAmbList) {
+            latitud = map.get("latitud");
+            longitud = map.get("longitud");
+            tipo = map.get("tipo");
+            id = map.get("id");
+
+            marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+
+            if(tipo.equals("NoiseLevelObserved")){
+                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+
+        }
+
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(marcador)
+                .zoom(15)
+                .build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        mapaTotal(googleMap);
     }
 
 
@@ -218,17 +270,24 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.todos:
+                //todos los sensores
+                mapaTotal(map);
+                return true;
+            case R.id.weather:
+                //sensores atmosfericos
+                mapaWeather(map);
+                return true;
+            case R.id.noise:
+                //sensores de ruido
+                mapaRuido(map);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
 
