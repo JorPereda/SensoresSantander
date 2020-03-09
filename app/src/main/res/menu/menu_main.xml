@@ -2,18 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.sensorsantander.MainActivity">
-
-    <item android:id="@+id/todos"
-        android:title="@string/todos"
-        android:orderInCategory="1"
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
         app:showAsAction="never" />
-    <item android:id="@+id/weather"
-        android:title="@string/weather"
-        android:orderInCategory="2"
-        app:showAsAction="never" />
-    <item android:id="@+id/noise"
-        android:title="@string/noise"
-        android:orderInCategory="3"
-        app:showAsAction="never" />
-
 </menu>
