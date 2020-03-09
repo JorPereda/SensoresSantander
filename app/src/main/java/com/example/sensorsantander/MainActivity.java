@@ -1,13 +1,14 @@
 package com.example.sensorsantander;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.widget.Toolbar;
-import android.app.ActionBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -28,17 +30,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import Utilities.CustomMarkerInfoWindowView;
 import Utilities.HttpHandler;
+import Utilities.MyReceiver;
 
-public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback{
+public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
     private String TAG = MainActivity.class.getSimpleName();
 
     ArrayList<HashMap<String, String>> sensorAmbList;
-    ArrayList<HashMap<String, String>> sensoresBackup;
 
+    private BroadcastReceiver myReceiver = null;
     private GoogleMap map;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,8 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         sensorAmbList = new ArrayList<>();
 
+        myReceiver = new MyReceiver();
+        broadcastIntent();
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
         try {
@@ -62,16 +67,9 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             e.printStackTrace();
         }
 
-        /*lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detallesSensor = new Intent(view.getContext(), VistaDetallada.class);
-                HashMap<String, String> sensor = sensorAmbList.get(position);
-                detallesSensor.putExtra("map",sensor);
-                startActivity(detallesSensor);
-            }
-        });*/
-
+    }
+    public void broadcastIntent() {
+        registerReceiver(myReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private class GetSensoresAmbientales extends AsyncTask<Void, Void, Void> {
@@ -183,6 +181,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
+
             if(tipo.equals("WeatherObserved")){
                 googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
             }
@@ -198,6 +197,9 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+
     }
 
     public void mapaWeather(GoogleMap googleMap){
@@ -219,12 +221,6 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         }
 
-        CameraPosition cameraPosition = CameraPosition.builder()
-                .target(marcador)
-                .zoom(15)
-                .build();
-
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     public void mapaRuido(GoogleMap googleMap){
@@ -246,18 +242,23 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         }
 
-        CameraPosition cameraPosition = CameraPosition.builder()
-                .target(marcador)
-                .zoom(15)
-                .build();
-
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         mapaTotal(googleMap);
+        //googleMap.setOnMarkerClickListener(MainActivity.this);
+        //CustomMarkerInfoWindowView markerWindowView = new CustomMarkerInfoWindowView();
+        //googleMap.setInfoWindowAdapter(markerWindowView);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        Log.d("title",""+ marker.getTitle());
+        Log.d("position",""+ marker.getPosition());
+        return true;
     }
 
 

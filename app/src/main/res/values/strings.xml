@@ -17,4 +17,8 @@
     <string name="todos">Todos</string>
     <string name="weather">S. Atmosfericos</string>
     <string name="noise">S. Ruido</string>
+
+    <string name="title_window">Ventana popup</string>
+    <string name="text_boton_window">Boton ventana</string>
+
 </resources>
