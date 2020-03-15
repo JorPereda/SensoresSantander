@@ -20,5 +20,6 @@
 
     <string name="title_window">Ventana popup</string>
     <string name="text_boton_window">Boton ventana</string>
+    <string name="ver_mapa">Ver Mapa</string>
 
 </resources>

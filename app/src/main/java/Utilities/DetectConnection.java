@@ -4,21 +4,26 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-class NetworkUtil {
-    public static String getConnectivityStatusString(Context context) {
+
+public class DetectConnection {
+
+    public static String checkInternetConnection(Context context) {
+
         String status = null;
-        ConnectivityManager cm = (ConnectivityManager)           context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
         if (activeNetwork != null) {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                status = "Wifi enabled";
+                status = "Wifi";
                 return status;
             } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                status = "Mobile data enabled";
+                status = "Data";
                 return status;
             }
         } else {
-            status = "No internet is available";
+            status = "No net";
             return status;
         }
         return status;

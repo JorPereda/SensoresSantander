@@ -1,13 +1,12 @@
 package com.example.sensorsantander;
 
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,24 +29,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import Utilities.CustomMarkerInfoWindowView;
 import Utilities.HttpHandler;
-import Utilities.MyReceiver;
 
-public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
+public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private String TAG = MainActivity.class.getSimpleName();
-
+    private String TAG = VistaMapa.class.getSimpleName();
     ArrayList<HashMap<String, String>> sensorAmbList;
 
-    private BroadcastReceiver myReceiver = null;
+    //private BroadcastReceiver myReceiver = null;
     private GoogleMap map;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setMax(10);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -55,8 +54,6 @@ public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMark
 
         sensorAmbList = new ArrayList<>();
 
-        myReceiver = new MyReceiver();
-        broadcastIntent();
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
         try {
@@ -68,16 +65,19 @@ public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMark
         }
 
     }
-    public void broadcastIntent() {
-        registerReceiver(myReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
 
-    private class GetSensoresAmbientales extends AsyncTask<Void, Void, Void> {
+    /*public void broadcastIntent() {
+        registerReceiver(myReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }*/
+
+    private class GetSensoresAmbientales extends AsyncTask<Void, Integer, Void> {
 
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            Toast.makeText(MainActivity.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setProgress(0);
+            Toast.makeText(VistaMapa.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -159,14 +159,18 @@ public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMark
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            progressBar.setVisibility(View.GONE);
             /*ListAdapter adapter = new SimpleAdapter(MainActivity.this, sensorAmbList,
                     R.layout.lista_personalizada, new String[]{"id","temperatura"},
                     new int[]{R.id.identificador, R.id.temperatura});
             lv.setAdapter(adapter);*/
-
-
-
          }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
+
     }
 
     public void mapaTotal(GoogleMap googleMap){
@@ -248,7 +252,7 @@ public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMark
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         mapaTotal(googleMap);
-        //googleMap.setOnMarkerClickListener(MainActivity.this);
+        //googleMap.setOnMarkerClickListener(VistaMapa.this);
         //CustomMarkerInfoWindowView markerWindowView = new CustomMarkerInfoWindowView();
         //googleMap.setInfoWindowAdapter(markerWindowView);
     }
@@ -256,8 +260,8 @@ public class MainActivity extends AppCompatActivity  implements GoogleMap.OnMark
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        Log.d("title",""+ marker.getTitle());
-        Log.d("position",""+ marker.getPosition());
+        //Log.d("title",""+ marker.getTitle());
+        //Log.d("position",""+ marker.getPosition());
         return true;
     }
 
