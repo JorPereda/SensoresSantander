@@ -2,7 +2,6 @@ package com.example.sensorsantander;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,22 +20,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import Utilities.HttpHandler;
+import Utilities.ServerResponse;
 
 public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
     private String TAG = VistaMapa.class.getSimpleName();
     ArrayList<HashMap<String, String>> sensorAmbList;
 
-    //private BroadcastReceiver myReceiver = null;
     private GoogleMap map;
     private ProgressBar progressBar;
 
@@ -66,10 +60,6 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
     }
 
-    /*public void broadcastIntent() {
-        registerReceiver(myReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }*/
-
     private class GetSensoresAmbientales extends AsyncTask<Void, Integer, Void> {
 
         @Override
@@ -77,83 +67,14 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
             super.onPreExecute();
             progressBar.setVisibility(View.VISIBLE);
             progressBar.setProgress(0);
-            Toast.makeText(VistaMapa.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
+            progressBar.bringToFront();
+            Toast.makeText(VistaMapa.this,"Descargando datos",Toast.LENGTH_LONG).show();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            String url = "http://datos.santander.es/api/rest/datasets/sensores_smart_env_monitoring.json";
-            String jsonStr = sh.makeServiceCall(url);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-
-                    // Getting JSON Array node
-                    JSONArray sensores = jsonObj.getJSONArray("resources");
-
-                    // looping through All sensors
-                    for (int i = 0; i < sensores.length(); i++) {
-                        JSONObject s = sensores.getJSONObject(i);
-                        String id = s.getString("dc:identifier");
-                        String tipo = s.getString("ayto:type");
-                        String ruido = s.getString("ayto:noise");
-                        String luminosidad = s.getString("ayto:light");
-                        String temperatura = s.getString("ayto:temperature");
-                        String bateria = s.getString("ayto:battery");
-                        String latitud = s.getString("ayto:latitude");
-                        String longitud = s.getString("ayto:longitude");
-                        String ultMod = s.getString("dc:modified");
-                        String uri = s.getString("uri");
-
-                        // tmp hash map for single sensor
-                        HashMap<String, String> sensor = new HashMap<>();
-
-                        // adding each child node to HashMap key => value
-                        sensor.put("id", id);
-                        sensor.put("tipo", tipo);
-                        sensor.put("ruido", ruido);
-                        sensor.put("luminosidad", luminosidad);
-                        sensor.put("temperatura", temperatura);
-                        sensor.put("bateria", bateria);
-                        sensor.put("latitud", latitud);
-                        sensor.put("longitud", longitud);
-                        sensor.put("ultModificacion", ultMod);
-                        sensor.put("uri", uri);
-
-                        // adding sensor to sensor list
-                        sensorAmbList.add(sensor);
-                    }
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-
+            sensorAmbList = new ServerResponse().getResponse();
             return null;
-
         }
 
         @Override

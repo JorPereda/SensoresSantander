@@ -46,39 +46,11 @@ public class MenuPrincipal extends AppCompatActivity {
 
                 final AlertDialog alertSinRed = builderSinRed.create();
 
-                //Mensaje si no hay wifi
-                AlertDialog.Builder builderSinWifi = new AlertDialog.Builder(v.getContext());
-                builderSinWifi.setMessage("Esta intentando acceder al mapa mediante una conexión de datos.\nEs recomendable que acceda mediante wifi.");
-                builderSinWifi.setCancelable(true);
-
-                builderSinWifi.setPositiveButton(
-                        "Continuar",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                startActivityForResult(intent, 0);
-                            }
-                        });
-
-                builderSinWifi.setNegativeButton(
-                        "Cancelar",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                AlertDialog alertSinWifi = builderSinWifi.create();
-
-
                 //Resto de casos de conexion
                 if (DetectConnection.checkInternetConnection(mContext).equals("No net")) {
                     alertSinRed.show();
-                } else if (DetectConnection.checkInternetConnection(mContext).equals("Wifi")){
+                } else {
                     startActivityForResult(intent, 0);
-                } else if (DetectConnection.checkInternetConnection(mContext).equals("Data")){
-                    alertSinWifi.show();
-
                 }
             }
         });
