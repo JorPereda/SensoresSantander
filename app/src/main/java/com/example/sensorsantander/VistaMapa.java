@@ -2,6 +2,7 @@ package com.example.sensorsantander;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,9 +54,9 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
         try {
             new GetSensoresAmbientales().execute().get();
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            Log.e(TAG, "ExecutionException: " + e.getMessage());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "InterruptedException: " + e.getMessage());
         }
 
     }
@@ -81,10 +82,6 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             progressBar.setVisibility(View.GONE);
-            /*ListAdapter adapter = new SimpleAdapter(MainActivity.this, sensorAmbList,
-                    R.layout.lista_personalizada, new String[]{"id","temperatura"},
-                    new int[]{R.id.identificador, R.id.temperatura});
-            lv.setAdapter(adapter);*/
          }
 
         @Override

@@ -102,9 +102,9 @@ public class ServerResponse {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "IOException: " + e.getMessage());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.e(TAG, "Exception: " + ex.getMessage());
         }
 
         return sensorAmbList;

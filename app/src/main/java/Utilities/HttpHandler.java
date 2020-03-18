@@ -50,12 +50,12 @@ public class HttpHandler {
                 sb.append(line).append('\n');
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "IOException: " + e.getMessage());
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "IOException: " + e.getMessage());
             }
         }
 
