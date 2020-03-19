@@ -1,7 +1,7 @@
-package Utilities;
+package utilities;
 
 import android.util.Log;
-import android.widget.Toast;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,13 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ServerResponse {
 
     private static final String TAG = ServerResponse.class.getSimpleName();
     ArrayList<HashMap<String, String>> sensorAmbList;
 
-    public ArrayList<HashMap<String, String>> getResponse(){
+    public List<HashMap<String, String>> getResponse(){
 
         sensorAmbList = new ArrayList<>();
         HttpHandler sh = new HttpHandler();

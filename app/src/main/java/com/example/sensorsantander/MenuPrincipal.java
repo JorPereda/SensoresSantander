@@ -10,7 +10,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import Utilities.DetectConnection;
+import utilities.DetectConnection;
 
 public class MenuPrincipal extends AppCompatActivity {
 

@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import Utilities.ServerResponse;
+import utilities.ServerResponse;
 
 public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private String TAG = VistaMapa.class.getSimpleName();
+    private String tag = VistaMapa.class.getSimpleName();
     ArrayList<HashMap<String, String>> sensorAmbList;
 
     private GoogleMap map;
@@ -54,9 +54,10 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
         try {
             new GetSensoresAmbientales().execute().get();
         } catch (ExecutionException e) {
-            Log.e(TAG, "ExecutionException: " + e.getMessage());
+            Log.e(tag, "ExecutionException: " + e.getMessage());
         } catch (InterruptedException e) {
-            Log.e(TAG, "InterruptedException: " + e.getMessage());
+            Log.e(tag, "InterruptedException: " + e.getMessage());
+            Thread.currentThread().interrupt();
         }
 
     }
@@ -74,7 +75,7 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
         @Override
         protected Void doInBackground(Void... voids) {
-            sensorAmbList = new ServerResponse().getResponse();
+            sensorAmbList = (ArrayList<HashMap<String, String>>) new ServerResponse().getResponse();
             return null;
         }
 
@@ -92,14 +93,17 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
     }
 
     public void mapaTotal(GoogleMap googleMap){
-        String latitud, longitud, tipo, id;
+        String latitud;
+        String longitud;
+        String tipo;
+        String id;
         LatLng marcador = null;
 
-        for(HashMap<String, String> map : sensorAmbList) {
-            latitud = map.get("latitud");
-            longitud = map.get("longitud");
-            tipo = map.get("tipo");
-            id = map.get("id");
+        for(HashMap<String, String> hashmap : sensorAmbList) {
+            latitud = hashmap.get("latitud");
+            longitud = hashmap.get("longitud");
+            tipo = hashmap.get("tipo");
+            id = hashmap.get("id");
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -126,14 +130,17 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
     public void mapaWeather(GoogleMap googleMap){
         googleMap.clear();
-        String latitud, longitud, tipo, id;
+        String latitud;
+        String longitud;
+        String tipo;
+        String id;
         LatLng marcador = null;
 
-        for(HashMap<String, String> map : sensorAmbList) {
-            latitud = map.get("latitud");
-            longitud = map.get("longitud");
-            tipo = map.get("tipo");
-            id = map.get("id");
+        for(HashMap<String, String> hashmap : sensorAmbList) {
+            latitud = hashmap.get("latitud");
+            longitud = hashmap.get("longitud");
+            tipo = hashmap.get("tipo");
+            id = hashmap.get("id");
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -147,14 +154,17 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
     public void mapaRuido(GoogleMap googleMap){
         googleMap.clear();
-        String latitud, longitud, tipo, id;
+        String latitud;
+        String longitud;
+        String tipo;
+        String id;
         LatLng marcador = null;
 
-        for(HashMap<String, String> map : sensorAmbList) {
-            latitud = map.get("latitud");
-            longitud = map.get("longitud");
-            tipo = map.get("tipo");
-            id = map.get("id");
+        for(HashMap<String, String> hashmap : sensorAmbList) {
+            latitud = hashmap.get("latitud");
+            longitud = hashmap.get("longitud");
+            tipo = hashmap.get("tipo");
+            id = hashmap.get("id");
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -170,16 +180,10 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         mapaTotal(googleMap);
-        //googleMap.setOnMarkerClickListener(VistaMapa.this);
-        //CustomMarkerInfoWindowView markerWindowView = new CustomMarkerInfoWindowView();
-        //googleMap.setInfoWindowAdapter(markerWindowView);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-
-        //Log.d("title",""+ marker.getTitle());
-        //Log.d("position",""+ marker.getPosition());
         return true;
     }
 
