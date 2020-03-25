@@ -1,4 +1,4 @@
-package com.example.sensorsantander;
+package com.example.views;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import utilities.DetectConnection;
 
-public class MenuPrincipal extends AppCompatActivity {
+
+public class VistaMenuPrincipal extends AppCompatActivity {
 
     Context mContext;
 

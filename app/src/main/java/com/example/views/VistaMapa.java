@@ -1,8 +1,7 @@
-package com.example.sensorsantander;
+package com.example.views;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,11 +24,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import utilities.ServerResponse;
+import presenters.SensorAppPresenter;
+import utilities.Interfaces_MVP;
 
-public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
+public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private String tag = VistaMapa.class.getSimpleName();
+    private Interfaces_MVP.ProvidedPresenterOps mPresenter;
+
     ArrayList<HashMap<String, String>> sensorAmbList;
 
     private GoogleMap map;
@@ -41,28 +42,28 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
         setContentView(R.layout.activity_main);
 
         progressBar = findViewById(R.id.progressBar);
-        progressBar.setMax(10);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         sensorAmbList = new ArrayList<>();
+        mPresenter = new SensorAppPresenter(this);
 
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
+
         try {
-            new GetSensoresAmbientales().execute().get();
+            new DatosAsyncTask().execute().get();
         } catch (ExecutionException e) {
-            Log.e(tag, "ExecutionException: " + e.getMessage());
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            Log.e(tag, "InterruptedException: " + e.getMessage());
-            Thread.currentThread().interrupt();
+            e.printStackTrace();
         }
+
 
     }
 
-    private class GetSensoresAmbientales extends AsyncTask<Void, Integer, Void> {
+    private class DatosAsyncTask extends AsyncTask<Void, Integer, Void> {
 
         @Override
         protected void onPreExecute(){
@@ -73,9 +74,10 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
             Toast.makeText(VistaMapa.this,"Descargando datos",Toast.LENGTH_LONG).show();
         }
 
+
         @Override
         protected Void doInBackground(Void... voids) {
-            sensorAmbList = (ArrayList<HashMap<String, String>>) new ServerResponse().getResponse();
+            sensorAmbList = mPresenter.showSensorData();
             return null;
         }
 
@@ -83,7 +85,7 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             progressBar.setVisibility(View.GONE);
-         }
+        }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
@@ -92,14 +94,26 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
     }
 
-    public void mapaTotal(GoogleMap googleMap){
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        mapaTotal(googleMap);
+    }
+
+    public void mapaTotal(GoogleMap googleMap) {
         String latitud;
         String longitud;
         String tipo;
         String id;
         LatLng marcador = null;
 
-        for(HashMap<String, String> hashmap : sensorAmbList) {
+        for (HashMap<String, String> hashmap : sensorAmbList) {
             latitud = hashmap.get("latitud");
             longitud = hashmap.get("longitud");
             tipo = hashmap.get("tipo");
@@ -107,11 +121,10 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
-
-            if(tipo.equals("WeatherObserved")){
+            if (tipo.equals("WeatherObserved")) {
                 googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
             }
-            if(tipo.equals("NoiseLevelObserved")){
+            if (tipo.equals("NoiseLevelObserved")) {
                 googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
             }
 
@@ -123,63 +136,6 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
-
-    }
-
-    public void mapaWeather(GoogleMap googleMap){
-        googleMap.clear();
-        String latitud;
-        String longitud;
-        String tipo;
-        String id;
-        LatLng marcador = null;
-
-        for(HashMap<String, String> hashmap : sensorAmbList) {
-            latitud = hashmap.get("latitud");
-            longitud = hashmap.get("longitud");
-            tipo = hashmap.get("tipo");
-            id = hashmap.get("id");
-
-            marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-
-            if(tipo.equals("WeatherObserved")){
-                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-            }
-
-        }
-
-    }
-
-    public void mapaRuido(GoogleMap googleMap){
-        googleMap.clear();
-        String latitud;
-        String longitud;
-        String tipo;
-        String id;
-        LatLng marcador = null;
-
-        for(HashMap<String, String> hashmap : sensorAmbList) {
-            latitud = hashmap.get("latitud");
-            longitud = hashmap.get("longitud");
-            tipo = hashmap.get("tipo");
-            id = hashmap.get("id");
-
-            marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-
-            if(tipo.equals("NoiseLevelObserved")){
-                googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-            }
-
-        }
-
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        mapaTotal(googleMap);
     }
 
     @Override
@@ -197,24 +153,7 @@ public class VistaMapa extends AppCompatActivity  implements GoogleMap.OnMarkerC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.todos:
-                //todos los sensores
-                mapaTotal(map);
-                return true;
-            case R.id.weather:
-                //sensores atmosfericos
-                mapaWeather(map);
-                return true;
-            case R.id.noise:
-                //sensores de ruido
-                mapaRuido(map);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
+        return mPresenter.menuOptionsClicked(item, map);
     }
 
 

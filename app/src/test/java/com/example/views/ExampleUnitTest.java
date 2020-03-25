@@ -1,4 +1,4 @@
-package com.example.sensorsantander;
+package com.example.views;
 
 import org.junit.Test;
 

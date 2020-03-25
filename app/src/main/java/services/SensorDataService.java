@@ -1,4 +1,4 @@
-package utilities;
+package services;
 
 import android.util.Log;
 
@@ -14,12 +14,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ServerResponse {
+import utilities.HttpHandler;
+import utilities.Interfaces_MVP;
 
-    private static final String TAG = ServerResponse.class.getSimpleName();
+
+public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
+
+    // Presenter reference
+    private Interfaces_MVP.RequiredPresenterOps mPresenter;
+
+    private static final String tag = SensorDataService.class.getSimpleName();
     ArrayList<HashMap<String, String>> sensorAmbList;
 
-    public List<HashMap<String, String>> getResponse(){
+    /**
+     * Main constructor, called by Activity during MVP setup
+     * @param Interfaces_MVP.RequiredPresenterOps presenter instance
+     */
+    public SensorDataService(Interfaces_MVP.RequiredPresenterOps presenter) {
+        this.mPresenter = presenter;
+    }
+
+    public List<HashMap<String, String>> getSensorData(){
 
         sensorAmbList = new ArrayList<>();
         HttpHandler sh = new HttpHandler();
@@ -45,7 +60,7 @@ public class ServerResponse {
 
             //HTTP: 200
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                Log.e(TAG, "Response from url: " + jsonStr);
+                Log.e(tag, "Response from url: " + jsonStr);
                     try {
                         JSONObject jsonObj = new JSONObject(jsonStr);
 
@@ -85,9 +100,10 @@ public class ServerResponse {
                             sensorAmbList.add(sensor);
                         }
                     } catch (final JSONException e) {
-                        Log.e(TAG, "Json parsing error: " + e.getMessage());
+                        Log.e(tag, "Json parsing error: " + e.getMessage());
                     }
                 //HTTP: 400 Bad Request. El servidor no puede o no va a procesar el request por un error de sintaxis del cliente.
+                //No deberia producirse por tener url fija
             } else if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
 
                 //HTTP: 403 Forbidden. El request fue válido pero el servidor se niega a responder.
@@ -98,14 +114,15 @@ public class ServerResponse {
             } else  if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
 
                 //HTTP: 500  Internal Server Error. Error genérico, cuando se ha dado una condición no esperada y no se puede concretar el mensaje.
+                //No deberia producirse por tener url fija
             } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
 
             }
 
         } catch (IOException e) {
-            Log.e(TAG, "IOException: " + e.getMessage());
+            Log.e(tag, "IOException: " + e.getMessage());
         } catch (Exception ex) {
-            Log.e(TAG, "Exception: " + ex.getMessage());
+            Log.e(tag, "Exception: " + ex.getMessage());
         }
 
         return sensorAmbList;
