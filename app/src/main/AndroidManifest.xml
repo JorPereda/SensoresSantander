@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.views">
+    package="com.example.sensorsantander">
 
     <!-- MAP PERMISSION -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <permission
-        android:name="com.example.views.permission.MAPS_RECEIVE"
+        android:name="com.example.sensorsantander.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.example.sensorsantander.permission.MAPS_RECEIVE" />
@@ -32,7 +32,7 @@
         <!-- Para que funcione en android 9-->
 
         <activity
-            android:name="com.example.views.VistaMenuPrincipal"
+            android:name="com.example.sensorsantander.VistaMenuPrincipal"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,7 +42,23 @@
         </activity>
 
         <activity
-            android:name="com.example.views.VistaMapa"
+            android:name="com.example.sensorsantander.VistaMapa"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.example.sensorsantander.VistaDetallada"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.example.sensorsantander.VistaFavoritos"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT"/>

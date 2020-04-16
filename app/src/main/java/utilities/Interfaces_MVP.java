@@ -4,6 +4,7 @@ import android.view.MenuItem;
 
 import com.google.android.gms.maps.GoogleMap;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,13 +18,14 @@ public interface Interfaces_MVP {
         void showServerNotAvailable();
         void showConnectionNotAvailable();
         boolean menuOptionsClicked(MenuItem item, GoogleMap map);
+
     }
 
     /**
      * Metodos requeridos de Presenter disponibles para el Model
      */
     interface RequiredPresenterOps{
-        void getSensorData();
+        void getSensorData() throws AccessDeniedException;
     }
 
     /**

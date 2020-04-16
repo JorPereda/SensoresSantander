@@ -1,5 +1,7 @@
-package com.example.views;
+package com.example.sensorsantander;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +10,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,16 +29,22 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import presenters.SensorAppPresenter;
+import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
 
 public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private Interfaces_MVP.ProvidedPresenterOps mPresenter;
+    private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
 
-    ArrayList<HashMap<String, String>> sensorAmbList;
+    static ArrayList<HashMap<String, String>> sensorAmbList;
+    static ArrayList<HashMap<String, String>> listaFavoritos;
+
+    public static ArrayList<HashMap<String, String>> getListaFavoritos() {
+        return listaFavoritos;
+    }
 
     private GoogleMap map;
-    private ProgressBar progressBar;
+    private static ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +57,10 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sensorAmbList = new ArrayList<>();
+        listaFavoritos = new ArrayList<>();
         mPresenter = new SensorAppPresenter(this);
+
+
 
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
@@ -63,7 +76,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
 
     }
 
-    private class DatosAsyncTask extends AsyncTask<Void, Integer, Void> {
+    public static class DatosAsyncTask extends AsyncTask<Void, Integer, Void> {
 
         @Override
         protected void onPreExecute(){
@@ -71,7 +84,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
             progressBar.setVisibility(View.VISIBLE);
             progressBar.setProgress(0);
             progressBar.bringToFront();
-            Toast.makeText(VistaMapa.this,"Descargando datos",Toast.LENGTH_LONG).show();
         }
 
 
@@ -95,14 +107,43 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        progressBar.setVisibility(View.GONE);
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        googleMap.setInfoWindowAdapter(new CustomMarkerInfoWindowView(this));
+
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                String identificador;
+                HashMap<String, String> sensor = new HashMap<>();
+                Intent intent = new Intent(VistaMapa.this,VistaDetallada.class);
+                for (HashMap<String, String> hashmap : sensorAmbList) {
+                    identificador = hashmap.get("tipo") + hashmap.get("id");
+                    if(identificador.equals(marker.getTitle())){
+                        sensor = hashmap;
+                    }
+                }
+                intent.putExtra("map",sensor);
+                startActivity(intent);
+            }
+        });
+
+        googleMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+            @Override
+            public void onInfoWindowLongClick(Marker marker) {
+                String identificador;
+                for (HashMap<String, String> hashmap : sensorAmbList) {
+                    identificador = hashmap.get("tipo") + hashmap.get("id");
+                    if(identificador.equals(marker.getTitle())){
+                        listaFavoritos.add(hashmap);
+                        Toast.makeText(VistaMapa.this ,"Sensor "+ marker.getTitle() + " añadido a favoritos",Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(VistaMapa.this ,"No se ha añadido",Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
         mapaTotal(googleMap);
     }
 
@@ -136,6 +177,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        Toast.makeText(this ,"Descargando datos",Toast.LENGTH_LONG).show();
     }
 
     @Override

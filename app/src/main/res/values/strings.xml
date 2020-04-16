@@ -2,10 +2,8 @@
     <string name="app_name">Sansor</string>
     <string name="action_settings">Settings</string>
 
-    <string name="id_text">Identificador</string>
-    <string name="temp_text">Temperatura</string>
-    <string name="id_label">Id:</string>
-    <string name="temp_label">Temp:</string>
+    <string name="titulo_text">Titulo</string>
+    <string name="title_label">Nombre:</string>
     <string name="id_detalle">Id:</string>
     <string name="id_detalle_valor">Id del sensor</string>
     <string name="temp_detalle">Temp:</string>
@@ -21,5 +19,8 @@
     <string name="title_window">Ventana popup</string>
     <string name="text_boton_window">Boton ventana</string>
     <string name="ver_mapa">Ver Mapa</string>
+    <string name="ver_mas">Ver más</string>
+    <string name="favorito">Favorito</string>
+    <string name="boton_favoritos">Favoritos</string>
 
 </resources>

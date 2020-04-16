@@ -2,19 +2,12 @@ package services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import utilities.Interfaces_MVP;
 
 public class SDS_ServerNotAvailable extends SensorDataService {
 
-    /**
-     * Main constructor, called by Activity during MVP setup
-     *
-     * @param presenter Presenter instance
-     */
-    public SDS_ServerNotAvailable(Interfaces_MVP.RequiredPresenterOps presenter) {
-        super(presenter);
+
+    public SDS_ServerNotAvailable() {
+
     }
 
     public ArrayList<HashMap<String, String>> getSensorData(){
@@ -25,7 +18,7 @@ public class SDS_ServerNotAvailable extends SensorDataService {
             serverNotAvailable.printStackTrace();
         }
 
-        return null;
+        return sensorAmbList;
     }
 
     private class ServerNotAvailable extends Throwable {

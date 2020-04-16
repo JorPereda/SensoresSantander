@@ -1,17 +1,19 @@
 package presenters;
 
+import android.content.Context;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.example.views.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.example.sensorsantander.R;
+import com.example.sensorsantander.VistaMapa;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import services.SensorDataService;
 import utilities.Interfaces_MVP;
@@ -25,20 +27,37 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
 
     ArrayList<HashMap<String, String>> sensorAmbList;
 
+    public SensorAppPresenter(){
+        sensorAmbList = new ArrayList<>();
+    }
+
     public SensorAppPresenter(Interfaces_MVP.RequiredViewOps view){
         this.view = view;
         sensorAmbList = new ArrayList<>();
     }
 
-    @Override
-    public void getSensorData() {
-        sensorAmbList = (ArrayList<HashMap<String, String>>) new SensorDataService(this).getSensorData();
+    public SensorAppPresenter(Interfaces_MVP.ProvidedModelOps svc){
+        this.svc = svc;
+        sensorAmbList = new ArrayList<>();
+    }
+
+    public ArrayList<HashMap<String, String>> getSensorAmbList() {
+        return sensorAmbList;
+    }
+
+    public void setSensorAmbList(ArrayList<HashMap<String, String>> sensorAmbList) {
+        this.sensorAmbList = sensorAmbList;
     }
 
     @Override
-    public ArrayList<HashMap<String, String>> showSensorData() {
+    public ArrayList<HashMap<String, String>> showSensorData(){
         getSensorData();
         return sensorAmbList;
+    }
+
+    @Override
+    public void getSensorData() {
+        sensorAmbList = new SensorDataService().getSensorData();
     }
 
     @Override
@@ -51,11 +70,24 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
 
     }
 
+
+
     @Override
     public boolean menuOptionsClicked(MenuItem item, GoogleMap map) {
         TipoMapa tipo = new TipoMapa();
 
         switch (item.getItemId()) {
+            case R.id.action_refresh:
+                Toast.makeText((Context) view, "Refresh selected", Toast.LENGTH_SHORT).show();
+                tipo.mapaCompleto(map);
+                try {
+                    new VistaMapa.DatosAsyncTask().execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return true;
             case R.id.todos:
                 //todos los sensores
                 tipo.mapaCompleto(map);

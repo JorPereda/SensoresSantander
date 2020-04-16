@@ -1,4 +1,4 @@
-package com.example.views;
+package com.example.sensorsantander;
 
 import android.content.Context;
 

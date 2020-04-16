@@ -1,4 +1,4 @@
-package com.example.views;
+package com.example.sensorsantander;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +26,7 @@ public class VistaMenuPrincipal extends AppCompatActivity {
         mContext = getApplicationContext();
 
         Button irMapa = findViewById(R.id.button_mapa);
+        Button favoritos =findViewById(R.id.button_favoritos);
 
         irMapa.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,5 +57,12 @@ public class VistaMenuPrincipal extends AppCompatActivity {
             }
         });
 
+        favoritos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(v.getContext(), VistaFavoritos.class);
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -2,7 +2,6 @@ package services;
 
 import android.util.Log;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import utilities.HttpHandler;
 import utilities.Interfaces_MVP;
@@ -21,23 +19,20 @@ import utilities.Interfaces_MVP;
 public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
 
     // Presenter reference
-    private Interfaces_MVP.RequiredPresenterOps mPresenter;
+    //private Interfaces_MVP.RequiredPresenterOps mPresenter;
 
     private static final String tag = SensorDataService.class.getSimpleName();
+
     ArrayList<HashMap<String, String>> sensorAmbList;
 
-    /**
-     * Main constructor, called by Activity during MVP setup
-     * @param Interfaces_MVP.RequiredPresenterOps presenter instance
-     */
-    public SensorDataService(Interfaces_MVP.RequiredPresenterOps presenter) {
-        this.mPresenter = presenter;
+    public SensorDataService() {
+
     }
 
-    public List<HashMap<String, String>> getSensorData(){
+    public ArrayList<HashMap<String, String>> getSensorData(){
 
-        sensorAmbList = new ArrayList<>();
         HttpHandler sh = new HttpHandler();
+        int responseCode = -1;
 
         // Making a request to url and getting response
         String url = "http://datos.santander.es/api/rest/datasets/sensores_smart_env_monitoring.json";
@@ -56,10 +51,12 @@ public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
 
             httpConnection.connect();
 
-            int responseCode = httpConnection.getResponseCode();
+            responseCode = httpConnection.getResponseCode();
 
             //HTTP: 200
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                //Se inicializa la lista una vez sabido que el codigo es correcto, para comprobar que la lista es null en caso contrario
+                sensorAmbList = new ArrayList<>();
                 Log.e(tag, "Response from url: " + jsonStr);
                     try {
                         JSONObject jsonObj = new JSONObject(jsonStr);
