@@ -1,6 +1,8 @@
 package datos;
 
-public class SensorAmbiental {
+import java.io.Serializable;
+
+public class SensorAmbiental implements Serializable {
 
     private String identificador;
     private String battery;
@@ -12,6 +14,10 @@ public class SensorAmbiental {
     private String longitud;
     private String ultModificacion;
     private String uri;
+
+    public SensorAmbiental(){
+
+    }
 
     public SensorAmbiental(String identificador, String battery, String temperatura, String luminosidad,
                            String ruido, String tipo, String latitud, String longitud,

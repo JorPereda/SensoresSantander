@@ -24,22 +24,30 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import datos.GroupListFavoritos;
+import datos.SensorAmbiental;
 import presenters.SensorAppPresenter;
+import utilities.ComplexPreferences;
+import utilities.CustomExpandableListAdapter;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
+import utilities.ListComplexFavoritos;
 
 public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
     private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
 
-    static ArrayList<HashMap<String, String>> sensorAmbList;
-    static ArrayList<HashMap<String, String>> listaFavoritos;
+    static ArrayList<SensorAmbiental> sensorAmbList;
+    static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();;
 
-    public static ArrayList<HashMap<String, String>> getListaFavoritos() {
+    ListComplexFavoritos complexObject = new ListComplexFavoritos();
+
+    public static ArrayList<SensorAmbiental> getListaFavoritos() {
         return listaFavoritos;
     }
 
@@ -57,9 +65,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sensorAmbList = new ArrayList<>();
-        listaFavoritos = new ArrayList<>();
         mPresenter = new SensorAppPresenter(this);
-
 
 
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
@@ -74,6 +80,29 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
         }
 
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(this, "myfav", MODE_PRIVATE);
+        complexPreferences.putObject("list", complexObject);
+        complexPreferences.commit();
+
+    }
+
+    @Override
+    public Context getActivityContext() {
+        return this;
+    }
+
+    @Override
+    public void addToGroup(CustomExpandableListAdapter.Parent grupo) {}
+
+    @Override
+    public Context getAppContext() {
+        return getApplicationContext();
     }
 
     public static class DatosAsyncTask extends AsyncTask<Void, Integer, Void> {
@@ -115,15 +144,16 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
             @Override
             public void onInfoWindowClick(Marker marker) {
                 String identificador;
-                HashMap<String, String> sensor = new HashMap<>();
-                Intent intent = new Intent(VistaMapa.this,VistaDetallada.class);
-                for (HashMap<String, String> hashmap : sensorAmbList) {
-                    identificador = hashmap.get("tipo") + hashmap.get("id");
+                SensorAmbiental sensor = new SensorAmbiental();
+                Intent intent = new Intent(VistaMapa.this, VistaDetallada.class);
+                for (SensorAmbiental s : sensorAmbList) {
+                    identificador = s.getTipo() + s.getIdentificador();
                     if(identificador.equals(marker.getTitle())){
-                        sensor = hashmap;
+                        sensor = s;
                     }
                 }
-                intent.putExtra("map",sensor);
+                intent.putExtra("sensor", sensor);
+                //intent.putExtra("listaGrupos", sensor);
                 startActivity(intent);
             }
         });
@@ -132,13 +162,12 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
             @Override
             public void onInfoWindowLongClick(Marker marker) {
                 String identificador;
-                for (HashMap<String, String> hashmap : sensorAmbList) {
-                    identificador = hashmap.get("tipo") + hashmap.get("id");
+                for (SensorAmbiental s : sensorAmbList) {
+                    identificador = s.getTipo() + s.getIdentificador();
                     if(identificador.equals(marker.getTitle())){
-                        listaFavoritos.add(hashmap);
+                        listaFavoritos.add(s);
+                        complexObject.setLista(listaFavoritos);
                         Toast.makeText(VistaMapa.this ,"Sensor "+ marker.getTitle() + " añadido a favoritos",Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(VistaMapa.this ,"No se ha añadido",Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -154,11 +183,11 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
         String id;
         LatLng marcador = null;
 
-        for (HashMap<String, String> hashmap : sensorAmbList) {
-            latitud = hashmap.get("latitud");
-            longitud = hashmap.get("longitud");
-            tipo = hashmap.get("tipo");
-            id = hashmap.get("id");
+        for (SensorAmbiental s : sensorAmbList) {
+            latitud = s.getLatitud();
+            longitud = s.getLongitud();
+            tipo = s.getTipo();
+            id = s.getIdentificador();
 
             marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -195,7 +224,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return mPresenter.menuOptionsClicked(item, map);
+        return mPresenter.menuMapa(item, map);
     }
 
 

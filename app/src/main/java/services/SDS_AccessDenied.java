@@ -3,6 +3,8 @@ package services;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import datos.SensorAmbiental;
+
 public class SDS_AccessDenied extends SensorDataService {
 
 
@@ -10,7 +12,7 @@ public class SDS_AccessDenied extends SensorDataService {
 
     }
 
-    public ArrayList<HashMap<String, String>> getSensorData(){
+    public ArrayList<SensorAmbiental> getSensorData(){
         return null;
     }
 

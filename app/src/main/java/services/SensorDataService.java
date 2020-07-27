@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import datos.SensorAmbiental;
 import utilities.HttpHandler;
 import utilities.Interfaces_MVP;
 
@@ -23,13 +24,13 @@ public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
 
     private static final String tag = SensorDataService.class.getSimpleName();
 
-    ArrayList<HashMap<String, String>> sensorAmbList;
+    ArrayList<SensorAmbiental> sensorAmbList;
 
     public SensorDataService() {
 
     }
 
-    public ArrayList<HashMap<String, String>> getSensorData(){
+    public ArrayList<SensorAmbiental> getSensorData(){
 
         HttpHandler sh = new HttpHandler();
         int responseCode = -1;
@@ -78,23 +79,21 @@ public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
                             String ultMod = s.getString("dc:modified");
                             String uri = s.getString("uri");
 
-                            // tmp hash map for single sensor
-                            HashMap<String, String> sensor = new HashMap<>();
+                            SensorAmbiental sensorAmb = new SensorAmbiental();
 
-                            // adding each child node to HashMap key => value
-                            sensor.put("id", id);
-                            sensor.put("tipo", tipo);
-                            sensor.put("ruido", ruido);
-                            sensor.put("luminosidad", luminosidad);
-                            sensor.put("temperatura", temperatura);
-                            sensor.put("bateria", bateria);
-                            sensor.put("latitud", latitud);
-                            sensor.put("longitud", longitud);
-                            sensor.put("ultModificacion", ultMod);
-                            sensor.put("uri", uri);
+                            sensorAmb.setIdentificador(id);
+                            sensorAmb.setTipo(tipo);
+                            sensorAmb.setRuido(ruido);
+                            sensorAmb.setLuminosidad(luminosidad);
+                            sensorAmb.setTemperatura(temperatura);
+                            sensorAmb.setBattery(bateria);
+                            sensorAmb.setLatitud(latitud);
+                            sensorAmb.setLongitud(longitud);
+                            sensorAmb.setUltModificacion(ultMod);
+                            sensorAmb.setUri(uri);
 
                             // adding sensor to sensor list
-                            sensorAmbList.add(sensor);
+                            sensorAmbList.add(sensorAmb);
                         }
                     } catch (final JSONException e) {
                         Log.e(tag, "Json parsing error: " + e.getMessage());

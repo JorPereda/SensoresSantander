@@ -10,23 +10,32 @@ import android.widget.Button;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import utilities.ComplexPreferences;
 import utilities.DetectConnection;
+import utilities.ListComplexFavoritos;
 
 
 public class VistaMenuPrincipal extends AppCompatActivity {
 
     Context mContext;
 
+    /*ComplexPreferences complexPreferences;
+    ListComplexFavoritos complexObject = new ListComplexFavoritos();*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu_principal);
 
+       /* complexPreferences = ComplexPreferences.getComplexPreferences(this, "myfav", MODE_PRIVATE);
+        complexPreferences.putObject("list", complexObject);
+        complexPreferences.commit();*/
+
         // Get the application context
         mContext = getApplicationContext();
 
         Button irMapa = findViewById(R.id.button_mapa);
-        Button favoritos =findViewById(R.id.button_favoritos);
+        Button favoritos = findViewById(R.id.button_favoritos);
 
         irMapa.setOnClickListener(new View.OnClickListener() {
             @Override

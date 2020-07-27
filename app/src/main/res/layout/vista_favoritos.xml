@@ -4,10 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/list_view"
+    <ExpandableListView
+        android:id="@+id/list_view_favoritos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
         android:divider="#000000"
         android:dividerHeight="1dp"/>
 

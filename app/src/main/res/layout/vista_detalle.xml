@@ -6,9 +6,10 @@
     android:paddingRight="16dp">
 
     <LinearLayout
+        android:id="@+id/layout_datos"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/imagen_sensor_detalle"
@@ -83,6 +84,32 @@
         android:layout_toRightOf="@+id/light_detalle_label"
         android:layout_toEndOf="@+id/light_detalle_label"
         android:text="@string/light_detalle_valor" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_botones"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layout_datos"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/texto_seccion_favoritos"
+            android:text="Selecciona el grupo al que añadir este sensor:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:id="@+id/selector_grupo"
+            android:background="@drawable/spinner_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/boton_add_favoritos"
+            android:text="Añadir a favoritos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </RelativeLayout>

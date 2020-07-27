@@ -1,56 +1,104 @@
 package presenters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.example.sensorsantander.R;
+import com.example.sensorsantander.VistaFavoritos;
 import com.example.sensorsantander.VistaMapa;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import datos.SensorAmbiental;
+import datos.VariablesGlobales;
 import services.SensorDataService;
+import utilities.ComplexPreferences;
+import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
+import utilities.ListComplexGrupos;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, Interfaces_MVP.RequiredPresenterOps {
 
-    // View reference
-    private Interfaces_MVP.RequiredViewOps view;
+    // View reference.
+    private Interfaces_MVP.RequiredViewOps mView;
+    private String m_Text = "";
     // Model reference (o service)
     private Interfaces_MVP.ProvidedModelOps svc;
 
-    ArrayList<HashMap<String, String>> sensorAmbList;
+    private ArrayList<SensorAmbiental> sensorAmbList;
+    private ArrayList<SensorAmbiental> listaFavoritos;
+    private ArrayList<CustomExpandableListAdapter.Parent> parents;
+
+    private ListComplexGrupos complexObjectGroup = new ListComplexGrupos();
 
     public SensorAppPresenter(){
         sensorAmbList = new ArrayList<>();
     }
 
     public SensorAppPresenter(Interfaces_MVP.RequiredViewOps view){
-        this.view = view;
+        mView = view;
         sensorAmbList = new ArrayList<>();
+        parents = VariablesGlobales.parents;
     }
 
     public SensorAppPresenter(Interfaces_MVP.ProvidedModelOps svc){
         this.svc = svc;
         sensorAmbList = new ArrayList<>();
+        parents = VariablesGlobales.parents;
     }
 
-    public ArrayList<HashMap<String, String>> getSensorAmbList() {
+    /**
+     * @return  Application context
+     */
+    @Override
+    public Context getAppContext() {
+        try {
+            return getView().getAppContext();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return  Activity context
+     */
+    @Override
+    public Context getActivityContext() {
+        try {
+            return getView().getActivityContext();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    public ArrayList<SensorAmbiental> getSensorAmbList() {
         return sensorAmbList;
     }
 
-    public void setSensorAmbList(ArrayList<HashMap<String, String>> sensorAmbList) {
+    public void setSensorAmbList(ArrayList<SensorAmbiental> sensorAmbList) {
         this.sensorAmbList = sensorAmbList;
     }
 
     @Override
-    public ArrayList<HashMap<String, String>> showSensorData(){
+    public ArrayList<SensorAmbiental> showSensorData(){
         getSensorData();
         return sensorAmbList;
     }
@@ -59,6 +107,8 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
     public void getSensorData() {
         sensorAmbList = new SensorDataService().getSensorData();
     }
+
+
 
     @Override
     public void showServerNotAvailable() {
@@ -70,15 +120,70 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
 
     }
 
+    @Override
+    public boolean menuFavoritos(MenuItem item){
 
+        switch (item.getItemId()) {
+            case R.id.irMapa:
+
+                Intent abrirMapa = new Intent(mView.getActivityContext(), VistaMapa.class);
+                mView.getActivityContext().startActivity(abrirMapa);
+                return true;
+
+            case R.id.action_add_element:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mView.getActivityContext());
+                builder.setTitle("Introduce el nombre del nuevo grupo:");
+
+                // Set up the input
+                final EditText input = new EditText(mView.getActivityContext());
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        m_Text = input.getText().toString();
+                        CustomExpandableListAdapter.Parent grupo = new CustomExpandableListAdapter.Parent(m_Text);
+                        mView.addToGroup(grupo);
+                        VariablesGlobales.nombreGrupos.add(m_Text);
+
+                        complexObjectGroup.setLista(VariablesGlobales.nombreGrupos);
+
+                        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(mView.getActivityContext(), "mygroups", MODE_PRIVATE);;
+                        complexPreferences.putObject("grupos", complexObjectGroup);
+                        complexPreferences.commit();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+
+                return true;
+
+            default:
+
+                return false;
+        }
+
+    }
 
     @Override
-    public boolean menuOptionsClicked(MenuItem item, GoogleMap map) {
+    public boolean menuMapa(MenuItem item, GoogleMap map) {
         TipoMapa tipo = new TipoMapa();
 
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                Toast.makeText((Context) view, "Refresh selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mView.getActivityContext(), "Refresh selected", Toast.LENGTH_SHORT).show();
                 tipo.mapaCompleto(map);
                 try {
                     new VistaMapa.DatosAsyncTask().execute().get();
@@ -87,6 +192,10 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                return true;
+            case R.id.action_home:
+                Intent goFavs = new Intent(mView.getActivityContext(), VistaFavoritos.class);
+                mView.getActivityContext().startActivity(goFavs);
                 return true;
             case R.id.todos:
                 //todos los sensores
@@ -101,9 +210,10 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                 tipo.mapaRuido(map);
                 return true;
             default:
-                return menuOptionsClicked(item, map);
+                return menuMapa(item, map);
         }
     }
+
 
     public class TipoMapa{
 
@@ -114,11 +224,11 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
             String id;
             LatLng marcador = null;
 
-            for(HashMap<String, String> hashmap : sensorAmbList) {
-                latitud = hashmap.get("latitud");
-                longitud = hashmap.get("longitud");
-                tipo = hashmap.get("tipo");
-                id = hashmap.get("id");
+            for(SensorAmbiental s: sensorAmbList) {
+                latitud = s.getLatitud();
+                longitud = s.getLongitud();
+                tipo = s.getTipo();
+                id = s.getIdentificador();
 
                 marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -139,11 +249,11 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
             String id;
             LatLng marcador = null;
 
-            for(HashMap<String, String> hashmap : sensorAmbList) {
-                latitud = hashmap.get("latitud");
-                longitud = hashmap.get("longitud");
-                tipo = hashmap.get("tipo");
-                id = hashmap.get("id");
+            for(SensorAmbiental s: sensorAmbList) {
+                latitud = s.getLatitud();
+                longitud = s.getLongitud();
+                tipo = s.getTipo();
+                id = s.getIdentificador();
 
                 marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -161,11 +271,11 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
             String id;
             LatLng marcador = null;
 
-            for(HashMap<String, String> hashmap : sensorAmbList) {
-                latitud = hashmap.get("latitud");
-                longitud = hashmap.get("longitud");
-                tipo = hashmap.get("tipo");
-                id = hashmap.get("id");
+            for(SensorAmbiental s: sensorAmbList) {
+                latitud = s.getLatitud();
+                longitud = s.getLongitud();
+                tipo = s.getTipo();
+                id = s.getIdentificador();
 
                 marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
@@ -175,5 +285,39 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
             }
         }
     }
+
+    /**
+     * Return the View reference.
+     * Throw an exception if the View is unavailable.
+     */
+    private Interfaces_MVP.RequiredViewOps getView() throws NullPointerException{
+        if ( mView != null )
+            return mView;
+        else
+            throw new NullPointerException("View is unavailable");
+    }
+
+    @Override
+    public void onClickAddFavorito(SensorAmbiental sensor, String grupo, View v){
+        mView = (Interfaces_MVP.RequiredViewOps) v;
+        CustomExpandableListAdapter.Child child = new CustomExpandableListAdapter.Child();
+        for (CustomExpandableListAdapter.Parent p : parents){
+            if(p.getNombre().equals(grupo)){
+                if(sensor.getTipo().equals("WeatherObserved")){
+                    child.setTipo(sensor.getTipo());
+                    child.setMedidaLabel("Temp: ");
+                    child.setMedida(sensor.getTemperatura());
+                }
+                if(sensor.getTipo().equals("NoiseLevelObserved")){
+                    child.setTipo(sensor.getTipo());
+                    child.setMedidaLabel("Noise: ");
+                    child.setMedida(sensor.getRuido());
+                }
+                p.addChild(child);
+            }
+        }
+    }
+
+
 
 }

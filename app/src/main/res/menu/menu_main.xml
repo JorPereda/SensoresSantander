@@ -5,9 +5,15 @@
 
     <item
         android:id="@+id/action_refresh"
-        android:orderInCategory="100"
+        android:orderInCategory="2"
         android:title="Refresh"
         android:icon="@mipmap/refreshicon"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_home"
+        android:orderInCategory="1"
+        android:title="Home"
+        android:icon="@mipmap/home"
         app:showAsAction="always" />
 
     <item android:id="@+id/todos"
