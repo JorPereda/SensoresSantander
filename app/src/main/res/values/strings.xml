@@ -23,5 +23,6 @@
     <string name="favorito">Favorito</string>
     <string name="boton_favoritos">Favoritos</string>
     <string name="iramapa">Ir a mapa</string>
+    <string name="editMode">Modo editar</string>
 
 </resources>

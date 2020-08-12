@@ -3,9 +3,7 @@ package utilities;
 import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.example.sensorsantander.VistaFavoritos;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.nio.file.AccessDeniedException;
@@ -23,8 +21,8 @@ public interface Interfaces_MVP {
         void showServerNotAvailable();
         void showConnectionNotAvailable();
         boolean menuMapa(MenuItem item, GoogleMap map);
-        boolean menuFavoritos(MenuItem item);
-        void onClickAddFavorito(SensorAmbiental sensor, String grupo, View v);
+        boolean menuFavoritos(MenuItem item, Activity activity);
+        void onClickAddFavorito(SensorAmbiental sensor, String grupo);
     }
 
     /**
@@ -43,6 +41,7 @@ public interface Interfaces_MVP {
         Context getAppContext();
         Context getActivityContext();
         void addToGroup(CustomExpandableListAdapter.Parent grupo);
+        void reloadAdapter();
     }
 
     /**

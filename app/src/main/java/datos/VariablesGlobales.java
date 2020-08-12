@@ -12,4 +12,8 @@ public class VariablesGlobales {
 
     public static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();
 
+    public static ArrayList<SensorAmbiental> listaSensoresCompleta  = new ArrayList<>();
+
+    public static CustomExpandableListAdapter.Child sensorHijo = new CustomExpandableListAdapter.Child();
+
 }

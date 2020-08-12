@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 import datos.GroupListFavoritos;
 import datos.SensorAmbiental;
+import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
 import utilities.ComplexPreferences;
 import utilities.CustomExpandableListAdapter;
@@ -73,6 +74,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
 
         try {
             new DatosAsyncTask().execute().get();
+            VariablesGlobales.listaSensoresCompleta = sensorAmbList;
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -99,6 +101,11 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
 
     @Override
     public void addToGroup(CustomExpandableListAdapter.Parent grupo) {}
+
+    @Override
+    public void reloadAdapter() {
+
+    }
 
     @Override
     public Context getAppContext() {
@@ -153,12 +160,11 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                     }
                 }
                 intent.putExtra("sensor", sensor);
-                //intent.putExtra("listaGrupos", sensor);
                 startActivity(intent);
             }
         });
 
-        googleMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+        /*googleMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
                 String identificador;
@@ -171,7 +177,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                     }
                 }
             }
-        });
+        });*/
 
         mapaTotal(googleMap);
     }

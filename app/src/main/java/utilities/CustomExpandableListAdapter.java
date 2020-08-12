@@ -19,28 +19,22 @@ import com.example.sensorsantander.R;
 import java.util.ArrayList;
 
 import datos.SensorAmbiental;
+import datos.VariablesGlobales;
 
 import static android.content.Context.MODE_PRIVATE;
 
 
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private ArrayList<Parent> parents = new ArrayList<Parent>();
+    private ArrayList<Parent> parents;
     public LayoutInflater inflater;
     public Activity activity;
-
-    ComplexPreferences complexPreferences;
-    ListComplexFavoritos complexObject = new ListComplexFavoritos();
-    ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<SensorAmbiental>();
 
 
     public CustomExpandableListAdapter(Activity act, ArrayList<Parent> parents) {
         activity = act;
         this.parents = parents;
         inflater = act.getLayoutInflater();
-        complexPreferences = ComplexPreferences.getComplexPreferences(activity, "myfav", MODE_PRIVATE);
-        complexObject = complexPreferences.getObject("list", ListComplexFavoritos.class);
-        listaFavoritos = complexObject.getLista();
     }
 
     @Override
@@ -82,18 +76,9 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Child c = parents.get(groupPosition).getChild(childPosition);
                         parents.get(groupPosition).removeChild(childPosition);
-                        String id;
-                        for(int i=0; i<listaFavoritos.size(); i++){
-                            id = listaFavoritos.get(i).getIdentificador();
-                            if(id.equals(c.getTitulo())){
-                               listaFavoritos.remove(listaFavoritos.get(i));
-                                complexPreferences.putObject("list", complexObject);
-                                complexPreferences.commit();
-                            }
-                        }
-
+                        TinyDB tinydb = new TinyDB(activity);
+                        tinydb.putListParent("parents", parents);
                         notifyDataSetChanged();
                     }
                 });
@@ -103,6 +88,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                         dialog.cancel();
                     }
                 });
+
 
                 builder.show();
             }
@@ -169,7 +155,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                         for(int i=0; i<parent.getChildren().size(); i++){
                             parent.removeChild(i);
                         }
-                        removeGroup(groupPosition);
+                        parents.remove(parent);
+                        VariablesGlobales.nombreGrupos.remove(parent.getNombre());
+                        TinyDB tinydb = new TinyDB(activity);
+                        tinydb.putListParent("parents", parents);
                         notifyDataSetChanged();
                     }
                 });
@@ -200,10 +189,17 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
-    public void removeGroup(int groupPos) {
-        parents.remove(groupPos);
+    /*public void removeGroup(int groupPos) {
+        Parent p = parents.get(groupPos);
+
+        for(int i=0; i<VariablesGlobales.nombreGrupos.size(); i++){
+            if(VariablesGlobales.nombreGrupos.get(i).equals(p.getNombre())){
+                VariablesGlobales.nombreGrupos.remove(i);
+            }
+        }
+        parents.remove(p);
         notifyDataSetChanged();
-    }
+    }*/
 
 
     //Clase para elemento padre en lista desplegable

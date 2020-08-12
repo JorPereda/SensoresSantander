@@ -22,6 +22,7 @@ import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
 import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
+import utilities.TinyDB;
 
 public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.RequiredViewOps {
 
@@ -44,7 +45,7 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     private String grupoSeleccionado;
     private Button botonAddFav;
 
-    private ArrayList<CustomExpandableListAdapter.Parent> parents;
+    private ArrayList<String> grupos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,9 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
         setContentView(R.layout.vista_detalle);
         mPresenter = new SensorAppPresenter(this);
 
-        parents = VariablesGlobales.parents;
+        //TinyDB tinydb = new TinyDB(this);
+        //grupos = tinydb.getListString("nombreGrupos");
+        grupos = VariablesGlobales.nombreGrupos;
 
         Intent intent = getIntent();
         sensor = (SensorAmbiental) intent.getSerializableExtra("sensor");
@@ -71,18 +74,19 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
         llenarCampos();
 
         selectorGrupo = findViewById(R.id.selector_grupo);
-        selectorGrupo.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, VariablesGlobales.nombreGrupos));
+        selectorGrupo.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, grupos));
         selectorGrupo.setOnItemSelectedListener(this);
 
         botonAddFav = findViewById(R.id.boton_add_favoritos);
         botonAddFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.onClickAddFavorito(sensor, grupoSeleccionado, v);
+                mPresenter.onClickAddFavorito(sensor, grupoSeleccionado);
             }
         });
 
     }
+
 
 
     public void llenarCampos(){
@@ -102,7 +106,6 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
         switch (parent.getId())
         {
             case R.id.selector_grupo:
-                Toast.makeText(this,parent.getSelectedItem().toString(),Toast.LENGTH_SHORT).show();
                 grupoSeleccionado = parent.getSelectedItem().toString();
                 break;
 
@@ -118,16 +121,20 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public Context getAppContext() {
-        return null;
+        return getApplicationContext();
     }
 
     @Override
     public Context getActivityContext() {
-        return null;
+        return this;
     }
 
     @Override
     public void addToGroup(CustomExpandableListAdapter.Parent grupo) {
 
+    }
+
+    @Override
+    public void reloadAdapter() {
     }
 }
