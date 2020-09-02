@@ -135,6 +135,7 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
-    public void reloadAdapter() {
+    public void actionModeEditar() {
+
     }
 }

@@ -65,8 +65,8 @@
         android:layout_toRightOf="@+id/MedidaLabel"
         android:text="medida sensor" />
 
-    <ImageButton
-        android:id="@+id/boton_eliminar_sensor"
+    <CheckBox
+        android:id="@+id/checkbox_eliminar_sensor"
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,8 +74,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="15dp"
-        android:background="@mipmap/baseline_clear"/>
+        android:layout_marginRight="15dp"/>
 
 
 

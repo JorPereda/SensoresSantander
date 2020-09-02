@@ -3,6 +3,7 @@ package utilities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.DataSetObserver;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,12 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         inflater = act.getLayoutInflater();
     }
 
+    //Necesario para actualizar la lista al instante
+    public void setData(ArrayList<Parent> list) {
+        this.parents = list;
+        notifyDataSetChanged();
+    }
+
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         return parents.get(groupPosition).getChildren().get(childPosition);
@@ -59,13 +66,13 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         TextView t1 = convertView.findViewById(R.id.titulo);
         TextView t2 = convertView.findViewById(R.id.medida);
         TextView t3 = convertView.findViewById(R.id.MedidaLabel);
-        ImageButton buttonEliminar = convertView.findViewById(R.id.boton_eliminar_sensor);
+        //ImageButton buttonEliminar = convertView.findViewById(R.id.boton_eliminar_sensor);
 
         t1.setText(child.getTitulo());
         t2.setText(child.getMedida());
         t3.setText(child.getMedidaLabel());
 
-        buttonEliminar.setOnClickListener(new View.OnClickListener() {
+        /*buttonEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = activity;
@@ -92,7 +99,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
                 builder.show();
             }
-        });
+        });*/
 
         return convertView;
     }
@@ -179,6 +186,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
+
     @Override
     public boolean hasStableIds() {
         return false;
@@ -187,6 +195,11 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        super.registerDataSetObserver(observer);
     }
 
     /*public void removeGroup(int groupPos) {

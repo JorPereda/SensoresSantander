@@ -41,7 +41,7 @@ public interface Interfaces_MVP {
         Context getAppContext();
         Context getActivityContext();
         void addToGroup(CustomExpandableListAdapter.Parent grupo);
-        void reloadAdapter();
+        void actionModeEditar();
     }
 
     /**

@@ -3,12 +3,17 @@ package com.example.sensorsantander;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 
 import java.util.ArrayList;
 
@@ -30,6 +35,10 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
 
     private CustomExpandableListAdapter mAdapter;
 
+    private ActionMode mActionMode;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +52,12 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         ExpandableListView exList = findViewById(R.id.list_view_favoritos);
         mAdapter = new CustomExpandableListAdapter(this, parents);
         exList.setAdapter(mAdapter);
+
+    }
+
+    @Override
+    public void actionModeEditar(){
+        mActionMode = startSupportActionMode(mActionModeCallback);
     }
 
     @Override
@@ -53,7 +68,6 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
 
         tinydb.putListString("nombreGrupos", VariablesGlobales.nombreGrupos);
         tinydb.putListParent("parents", parents);
-
     }
 
 
@@ -63,7 +77,6 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         TinyDB tinydb = new TinyDB(this);
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
-
     }
 
     @Override
@@ -73,7 +86,6 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -104,11 +116,50 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
     @Override
     public void addToGroup(CustomExpandableListAdapter.Parent grupo) {
         parents.add(grupo);
+        mAdapter.setData(parents);
     }
 
-    @Override
-    public void reloadAdapter() {
-        mAdapter.notifyDataSetChanged();
-    }
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_actionmode, menu);
+            mode.setTitle("Choose your option");
+            CheckBox cb = findViewById(R.id.checkbox_eliminar_sensor);
+            cb.setVisibility(View.VISIBLE);
+            ExpandableListView expList = findViewById(R.id.list_view_favoritos);
+            SparseBooleanArray itemsChecked = expList.getCheckedItemPositions();
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.option_1:
+                    Toast.makeText(VistaFavoritos.this, "Option 1 selected", Toast.LENGTH_SHORT).show();
+
+                    mode.finish();
+                    return true;
+                case R.id.option_2:
+                    Toast.makeText(VistaFavoritos.this, "Option 2 selected", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            CheckBox cb = findViewById(R.id.checkbox_eliminar_sensor);
+            cb.setVisibility(View.INVISIBLE);
+            mActionMode = null;
+        }
+    };
 
 }

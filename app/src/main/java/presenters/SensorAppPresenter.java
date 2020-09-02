@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,8 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
 
     // Model reference (o service)
     private Interfaces_MVP.ProvidedModelOps svc;
+
+
 
     private ArrayList<SensorAmbiental> sensorAmbList;
     private ArrayList<CustomExpandableListAdapter.Parent> parents;
@@ -149,7 +152,6 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = inputGrupo.getText().toString();
                         CustomExpandableListAdapter.Parent grupo = new CustomExpandableListAdapter.Parent(m_Text);
-                        parents.add(grupo);
                         mView.addToGroup(grupo);
                         VariablesGlobales.nombreGrupos.add(m_Text);
                         TinyDB tinydb = new TinyDB(mView.getAppContext());
@@ -169,8 +171,12 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                 return true;
 
             case R.id.editMode:
-                ImageButton botongrupo =  activity.findViewById(R.id.eliminargrupo_button);
+
+                mView.actionModeEditar();
+
+                /*ImageButton botongrupo =  activity.findViewById(R.id.eliminargrupo_button);
                 ImageButton botonsensor =  activity.findViewById(R.id.boton_eliminar_sensor);
+
 
                 if(botongrupo.getVisibility()==View.INVISIBLE){
                     botongrupo.setVisibility(View.VISIBLE);
@@ -182,7 +188,7 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                     botonsensor.setVisibility(View.VISIBLE);
                 } else if(botonsensor.getVisibility()==View.VISIBLE){
                     botonsensor.setVisibility(View.INVISIBLE);
-                }
+                }*/
 
                 return true;
 

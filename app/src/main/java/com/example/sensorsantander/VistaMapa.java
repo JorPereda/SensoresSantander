@@ -29,15 +29,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import datos.GroupListFavoritos;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
-import utilities.ComplexPreferences;
 import utilities.CustomExpandableListAdapter;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
-import utilities.ListComplexFavoritos;
 
 public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
@@ -45,8 +42,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
 
     static ArrayList<SensorAmbiental> sensorAmbList;
     static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();;
-
-    ListComplexFavoritos complexObject = new ListComplexFavoritos();
 
     public static ArrayList<SensorAmbiental> getListaFavoritos() {
         return listaFavoritos;
@@ -87,11 +82,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     @Override
     protected void onStop() {
         super.onStop();
-
-        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(this, "myfav", MODE_PRIVATE);
-        complexPreferences.putObject("list", complexObject);
-        complexPreferences.commit();
-
     }
 
     @Override
@@ -103,7 +93,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     public void addToGroup(CustomExpandableListAdapter.Parent grupo) {}
 
     @Override
-    public void reloadAdapter() {
+    public void actionModeEditar() {
 
     }
 
@@ -163,21 +153,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 startActivity(intent);
             }
         });
-
-        /*googleMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
-            @Override
-            public void onInfoWindowLongClick(Marker marker) {
-                String identificador;
-                for (SensorAmbiental s : sensorAmbList) {
-                    identificador = s.getTipo() + s.getIdentificador();
-                    if(identificador.equals(marker.getTitle())){
-                        listaFavoritos.add(s);
-                        complexObject.setLista(listaFavoritos);
-                        Toast.makeText(VistaMapa.this ,"Sensor "+ marker.getTitle() + " añadido a favoritos",Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });*/
 
         mapaTotal(googleMap);
     }
