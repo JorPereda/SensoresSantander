@@ -66,43 +66,14 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         TextView t1 = convertView.findViewById(R.id.titulo);
         TextView t2 = convertView.findViewById(R.id.medida);
         TextView t3 = convertView.findViewById(R.id.MedidaLabel);
-        //ImageButton buttonEliminar = convertView.findViewById(R.id.boton_eliminar_sensor);
 
         t1.setText(child.getTitulo());
         t2.setText(child.getMedida());
         t3.setText(child.getMedidaLabel());
 
-        /*buttonEliminar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = activity;
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("¿Deseas eliminar el sensor de la lista?");
-
-                // Set up the buttons
-                builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        parents.get(groupPosition).removeChild(childPosition);
-                        TinyDB tinydb = new TinyDB(activity);
-                        tinydb.putListParent("parents", parents);
-                        notifyDataSetChanged();
-                    }
-                });
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-
-                builder.show();
-            }
-        });*/
-
         return convertView;
     }
+
 
     @Override
     public int getChildrenCount(int groupPosition) {
@@ -194,7 +165,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 
     @Override
@@ -252,6 +223,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         public void removeChild(int childPosition) {
             children.remove(childPosition);
+        }
+
+        public void removeChild(Child child) {
+            children.remove(child);
         }
 
 

@@ -362,6 +362,9 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                     //parents.add(p);
                     TinyDB tinydb = new TinyDB(mView.getAppContext());
                     tinydb.putListParent("parents", parents);
+
+                    Intent volverALista = new Intent(mView.getActivityContext(), VistaFavoritos.class);
+                    mView.getActivityContext().startActivity(volverALista);
                 }
 
             }
@@ -374,6 +377,8 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
         });
 
         builder.show();
+
+
 
     }
 

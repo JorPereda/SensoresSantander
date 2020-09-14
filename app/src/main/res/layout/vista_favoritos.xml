@@ -11,6 +11,6 @@
         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
         android:divider="#000000"
         android:dividerHeight="1dp"
-        android:choiceMode="none"/>
+        android:choiceMode="singleChoice"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
