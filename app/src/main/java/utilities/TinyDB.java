@@ -40,6 +40,8 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import datos.Parent;
+
 
 public class TinyDB {
 
@@ -344,25 +346,25 @@ public class TinyDB {
     }
 
 
-    public void putListParent(String key, ArrayList<CustomExpandableListAdapter.Parent> parents){
+    public void putListParent(String key, ArrayList<Parent> parents){
         checkForNullKey(key);
         Gson gson = new Gson();
         ArrayList<String> objStrings = new ArrayList<String>();
-        for(CustomExpandableListAdapter.Parent parent: parents){
+        for(Parent parent: parents){
             objStrings.add(gson.toJson(parent));
         }
         putListString(key, objStrings);
     }
 
     //No need Class<?> mClass parameter. Because we know it is Player!
-    public ArrayList<CustomExpandableListAdapter.Parent> getListParent(String key){
+    public ArrayList<Parent> getListParent(String key){
         Gson gson = new Gson();
 
         ArrayList<String> objStrings = getListString(key);
-        ArrayList<CustomExpandableListAdapter.Parent> parents =  new ArrayList<CustomExpandableListAdapter.Parent>();
+        ArrayList<Parent> parents =  new ArrayList<Parent>();
 
         for(String jObjString : objStrings){
-            CustomExpandableListAdapter.Parent parent  = gson.fromJson(jObjString,  CustomExpandableListAdapter.Parent.class);
+            Parent parent  = gson.fromJson(jObjString,  Parent.class);
             parents.add(parent);
         }
         return parents;

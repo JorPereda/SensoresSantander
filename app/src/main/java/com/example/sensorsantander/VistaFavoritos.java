@@ -3,19 +3,13 @@ package com.example.sensorsantander;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -29,6 +23,7 @@ import androidx.appcompat.view.ActionMode;
 
 import java.util.ArrayList;
 
+import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
@@ -36,25 +31,23 @@ import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
 
-import static android.content.ContentValues.TAG;
-
 
 public class VistaFavoritos extends AppCompatActivity implements View.OnClickListener, Interfaces_MVP.RequiredViewOps {
 
     private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
 
-    private ArrayList<CustomExpandableListAdapter.Parent> parents = new ArrayList<>();
+    private ArrayList<Parent> parents = new ArrayList<>();
 
     private CustomExpandableListAdapter mAdapter;
 
     private ExpandableListView expList;
 
-    private ArrayList<CustomExpandableListAdapter.Child> eliminables = new ArrayList<>();
+    private ArrayList<SensorAppPresenter> eliminables = new ArrayList<>();
 
     private ActionMode mActionMode;
-    private CustomExpandableListAdapter.Child sensorSelected;
-    private CustomExpandableListAdapter.Parent grupoSelected;
-
+    private SensorAmbiental sensorSelected;
+    private Parent grupoSelected;
+    private long packedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,26 +60,34 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         parents = tinydb.getListParent("parents");
         expList = findViewById(R.id.list_view_favoritos);
 
+
         expList.setSelector(R.drawable.selector_list_item);
         expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                long packedPosition = expList.getExpandableListPosition(position);
+                packedPosition = expList.getExpandableListPosition(position);
+
+                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+
+                int index = expList.getFlatListPosition(packedPosition);
+
+                /*  if group item clicked */
+                if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                        ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    expList.setItemChecked(index, true);
+                    grupoSelected = parents.get(groupPosition);
+                    actionModeEditar();
+                    return true;
+                }
+
                 if (ExpandableListView.getPackedPositionType(packedPosition) ==
                         ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    // get item ID's
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-                    int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
-
-                    int index = expList.getFlatListPosition(packedPosition);
 
                     // handle data
                     expList.setItemChecked(index, true);
-                    grupoSelected = parents.get(groupPosition);
                     sensorSelected = parents.get(groupPosition).getChild(childPosition);
                     actionModeEditar();
-
-
                     // return true as we are handling the event.
                     return true;
                 }
@@ -101,6 +102,8 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                 return true;
             }
         });
+
+
 
         mAdapter = new CustomExpandableListAdapter(this, parents);
         expList.setAdapter(mAdapter);
@@ -166,7 +169,7 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void addToGroup(CustomExpandableListAdapter.Parent grupo) {
+    public void addToGroup(Parent grupo) {
         parents.add(grupo);
         mAdapter.setData(parents);
     }
@@ -191,20 +194,59 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.delete:
-                    for(CustomExpandableListAdapter.Parent p : parents){
-                        p.removeChild(sensorSelected);
-                    }
-                    mAdapter.setData(parents);
+                    final AlertDialog.Builder builderDelete = new AlertDialog.Builder(getActivityContext());
+                    builderDelete.setTitle("¿Realmente deseas eliminar?");
+
+                    // Set up the buttons
+                    builderDelete.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                                    ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                                parents.remove(grupoSelected);
+                            }
+                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                                    ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                                for(Parent p : parents){
+                                    p.removeChild(sensorSelected);
+                                }
+                            }
+                            mAdapter.setData(parents);
+                        }
+                    });
+                    builderDelete.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builderDelete.show();
+
+
                     mode.finish();
                     return true;
                 case R.id.share:
-                    Intent myIntent = new Intent(Intent.ACTION_SEND);
-                    myIntent.setType("text/plain");
-                    String shareBody = sensorSelected.getTitulo() + "\n" + sensorSelected.getMedidaLabel() + sensorSelected.getMedida();
-                    String shareSub = "Your subject";
-                    myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-                    myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                    startActivity(Intent.createChooser(myIntent, "Share using"));
+                    if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                            ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                        Toast.makeText(getActivityContext(), "Selecciona un sensor para compartir", Toast.LENGTH_LONG).show();
+                    }else{
+                        Intent myIntent = new Intent(Intent.ACTION_SEND);
+                        myIntent.setType("text/plain");
+                        String shareBody = "";
+                        if(sensorSelected.getTipo().equals("WeatherObserved")){
+                            shareBody = sensorSelected.getTitulo() + "\n" + "Temp: " + sensorSelected.getTemperatura() +
+                                        "\n" + "https://maps.google.com/?q=" + sensorSelected.getLatitud() + "," + sensorSelected.getLongitud();
+                        }
+                        if(sensorSelected.getTipo().equals("NoiseLevelObserved")){
+                            shareBody = sensorSelected.getTitulo() + "\n" + "Noise: " + sensorSelected.getRuido() +
+                                        "\n" + "https://maps.google.com/?q=" + sensorSelected.getLatitud() + "," + sensorSelected.getLongitud();
+                        }
+                        String shareSub = "Your subject";
+                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                        startActivity(Intent.createChooser(myIntent, "Share using"));
+                    }
+
                     mode.finish();
                     return true;
                 case R.id.rename:
@@ -212,17 +254,24 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                     builder.setTitle("Introduce el nuevo nombre:");
 
                     // Set up the input
-                    final EditText inputGrupo = new EditText(getActivityContext());
+                    final EditText inputRename = new EditText(getActivityContext());
                     // Specify the type of input expected; this
-                    inputGrupo.setInputType(InputType.TYPE_CLASS_TEXT);
-                    builder.setView(inputGrupo);
+                    inputRename.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(inputRename);
 
                     // Set up the buttons
                     builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String m_Text = inputGrupo.getText().toString();
-                            sensorSelected.setTitulo(m_Text);
+                            String m_Text = inputRename.getText().toString();
+                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                                    ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                                grupoSelected.setNombre(m_Text);
+                            }
+                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                                    ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                                sensorSelected.setTitulo(m_Text);
+                            }
                             mAdapter.setData(parents);
                         }
                     });

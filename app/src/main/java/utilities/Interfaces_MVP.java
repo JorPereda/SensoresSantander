@@ -9,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 
+import datos.Parent;
 import datos.SensorAmbiental;
 
 public interface Interfaces_MVP {
@@ -40,7 +41,7 @@ public interface Interfaces_MVP {
     interface RequiredViewOps{
         Context getAppContext();
         Context getActivityContext();
-        void addToGroup(CustomExpandableListAdapter.Parent grupo);
+        void addToGroup(Parent grupo);
         void actionModeEditar();
     }
 

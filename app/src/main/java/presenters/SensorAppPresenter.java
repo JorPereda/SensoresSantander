@@ -1,20 +1,13 @@
 package presenters;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.InputType;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -30,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import services.SensorDataService;
@@ -49,7 +43,7 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
 
 
     private ArrayList<SensorAmbiental> sensorAmbList;
-    private ArrayList<CustomExpandableListAdapter.Parent> parents;
+    private ArrayList<Parent> parents;
 
     public SensorAppPresenter(){
         sensorAmbList = new ArrayList<>();
@@ -151,7 +145,7 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = inputGrupo.getText().toString();
-                        CustomExpandableListAdapter.Parent grupo = new CustomExpandableListAdapter.Parent(m_Text);
+                        Parent grupo = new Parent(m_Text);
                         mView.addToGroup(grupo);
                         VariablesGlobales.nombreGrupos.add(m_Text);
                         TinyDB tinydb = new TinyDB(mView.getAppContext());
@@ -341,12 +335,12 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String m_Text = inputSensor.getText().toString();
-                CustomExpandableListAdapter.Child child = new CustomExpandableListAdapter.Child();
-                child.setTitulo(m_Text);
+                //SensorAmbiental child = new SensorAmbiental();
+                sensor.setTitulo(m_Text);
 
-                for (CustomExpandableListAdapter.Parent p : parents){
+                for (Parent p : parents){
                     if(p.getNombre().equals(grupo)){
-                        if(sensor.getTipo().equals("WeatherObserved")){
+                        /*if(sensor.getTipo().equals("WeatherObserved")){
                             child.setTipo(sensor.getTipo());
                             child.setMedidaLabel("Temp: ");
                             child.setMedida(sensor.getTemperatura());
@@ -355,8 +349,8 @@ public class SensorAppPresenter implements Interfaces_MVP.ProvidedPresenterOps, 
                             child.setTipo(sensor.getTipo());
                             child.setMedidaLabel("Noise: ");
                             child.setMedida(sensor.getRuido());
-                        }
-                        p.addChild(child);
+                        }*/
+                        p.addChild(sensor);
                     }
                     //parents = tinydb.getListParent("parents");
                     //parents.add(p);

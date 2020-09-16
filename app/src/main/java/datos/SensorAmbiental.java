@@ -15,6 +15,8 @@ public class SensorAmbiental implements Serializable {
     private String ultModificacion;
     private String uri;
 
+    private String titulo;
+
     public SensorAmbiental(){
 
     }
@@ -112,5 +114,13 @@ public class SensorAmbiental implements Serializable {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getTitulo() {
+        return titulo;
     }
 }

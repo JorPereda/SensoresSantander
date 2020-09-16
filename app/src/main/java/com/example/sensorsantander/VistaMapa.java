@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,15 +23,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
-import utilities.CustomExpandableListAdapter;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
 
@@ -90,7 +87,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     }
 
     @Override
-    public void addToGroup(CustomExpandableListAdapter.Parent grupo) {}
+    public void addToGroup(Parent grupo) {}
 
     @Override
     public void actionModeEditar() {

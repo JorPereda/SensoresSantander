@@ -9,20 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.SensorAppPresenter;
-import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
-import utilities.TinyDB;
 
 public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.RequiredViewOps {
 
@@ -130,7 +127,7 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
-    public void addToGroup(CustomExpandableListAdapter.Parent grupo) {
+    public void addToGroup(Parent grupo) {
 
     }
 
