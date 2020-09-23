@@ -2,7 +2,6 @@ package datos;
 
 import java.util.ArrayList;
 
-import utilities.CustomExpandableListAdapter;
 
 //Clase para elemento padre en lista desplegable
 public  class Parent{

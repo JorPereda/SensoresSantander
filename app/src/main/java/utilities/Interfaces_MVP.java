@@ -3,6 +3,7 @@ package utilities;
 import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
+import android.widget.ExpandableListView;
 
 import com.google.android.gms.maps.GoogleMap;
 
@@ -17,13 +18,19 @@ public interface Interfaces_MVP {
     /**
      * Metodos ofrecidos a View para comunicar con el Presenter
      */
-    interface ProvidedPresenterOps{
+    interface ProvidedPresenterFavoritosOps {
+        ArrayList<SensorAmbiental> showSensorData();
+        void showServerNotAvailable();
+        void showConnectionNotAvailable();
+        boolean menuFavoritos(MenuItem item, Activity activity);
+        void onClickAddFavorito(SensorAmbiental sensor, String grupo);
+    }
+
+    interface ProvidedPresenterMapaOps{
         ArrayList<SensorAmbiental> showSensorData();
         void showServerNotAvailable();
         void showConnectionNotAvailable();
         boolean menuMapa(MenuItem item, GoogleMap map);
-        boolean menuFavoritos(MenuItem item, Activity activity);
-        void onClickAddFavorito(SensorAmbiental sensor, String grupo);
     }
 
     /**
@@ -38,11 +45,16 @@ public interface Interfaces_MVP {
     /**
      * Metodos View requeridos para el Presenter
      */
-    interface RequiredViewOps{
+    interface RequiredViewFavoritosOps{
         Context getAppContext();
         Context getActivityContext();
         void addToGroup(Parent grupo);
         void actionModeEditar();
+    }
+
+    interface RequiredViewMapaOps{
+        Context getAppContext();
+        Context getActivityContext();
     }
 
     /**

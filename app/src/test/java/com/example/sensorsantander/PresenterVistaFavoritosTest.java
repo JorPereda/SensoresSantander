@@ -6,15 +6,15 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import presenters.SensorAppPresenter;
+import presenters.PresenterVistaFavoritos;
 import services.SDS_AccessDenied;
 import services.SDS_ServerNotAvailable;
 import services.SensorDataService;
 
 
-public class SensorAppPresenterTest {
+public class PresenterVistaFavoritosTest {
 
-    SensorAppPresenter pr;
+    PresenterVistaFavoritos pr;
 
     ArrayList<HashMap<String, String>> sensorAmbList;
 
@@ -43,7 +43,7 @@ public class SensorAppPresenterTest {
 
     @Test
     public void getSensorDataTest(){
-        pr = new SensorAppPresenter(new SensorDataService());
+        pr = new PresenterVistaFavoritos(new SensorDataService());
         pr.setSensorAmbList(sensorAmbList);
         if(pr.getSensorAmbList() == null){
             throw new NullPointerException("La lectura de los datos no se ha producido");
@@ -52,13 +52,13 @@ public class SensorAppPresenterTest {
 
     @Test
     public void serverNotAvailableTest(){
-        pr = new SensorAppPresenter(new SDS_ServerNotAvailable());
+        pr = new PresenterVistaFavoritos(new SDS_ServerNotAvailable());
         pr.getSensorData();
     }
 
     @Test
     public void accessDeniedTest(){
-        pr = new SensorAppPresenter(new SDS_AccessDenied());
+        pr = new PresenterVistaFavoritos(new SDS_AccessDenied());
         pr.getSensorData();
     }
 }

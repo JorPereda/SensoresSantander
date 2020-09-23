@@ -26,16 +26,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
-import presenters.SensorAppPresenter;
+import presenters.PresenterVistaMapa;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
 
-public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
+public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewMapaOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
+    private static Interfaces_MVP.ProvidedPresenterMapaOps mPresenter;
 
     static ArrayList<SensorAmbiental> sensorAmbList;
     static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();;
@@ -50,7 +49,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.vista_mapa);
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -58,7 +57,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sensorAmbList = new ArrayList<>();
-        mPresenter = new SensorAppPresenter(this);
+        mPresenter = new PresenterVistaMapa(this);
 
 
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
@@ -84,14 +83,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     @Override
     public Context getActivityContext() {
         return this;
-    }
-
-    @Override
-    public void addToGroup(Parent grupo) {}
-
-    @Override
-    public void actionModeEditar() {
-
     }
 
     @Override

@@ -6,9 +6,10 @@
 
     <TextView
         android:id="@+id/listTitle"
+        android:textSize="21sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="40dp"
         android:layout_marginTop="9dp"/>
 
 

@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
-import presenters.SensorAppPresenter;
+import presenters.PresenterVistaFavoritos;
 import utilities.Interfaces_MVP;
 
-public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.RequiredViewOps {
+public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.RequiredViewFavoritosOps {
 
-    private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
+    private static Interfaces_MVP.ProvidedPresenterFavoritosOps mPresenter;
 
     private SensorAmbiental sensor;
 
@@ -48,7 +48,7 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_detalle);
-        mPresenter = new SensorAppPresenter(this);
+        mPresenter = new PresenterVistaFavoritos(this);
 
         //TinyDB tinydb = new TinyDB(this);
         //grupos = tinydb.getListString("nombreGrupos");

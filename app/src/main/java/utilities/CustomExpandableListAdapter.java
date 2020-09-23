@@ -1,25 +1,28 @@
 package utilities;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.database.DataSetObserver;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AlertDialog;
+import android.widget.Toast;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import com.example.sensorsantander.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import datos.Parent;
 import datos.SensorAmbiental;
-import datos.VariablesGlobales;
 
 
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
@@ -58,11 +61,14 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         final Parent parent = parents.get(groupPosition);
         final SensorAmbiental child = parent.getChildren().get(childPosition);
 
-        convertView = inflater.inflate(R.layout.lista_favoritos, parentView, false);
+        convertView = inflater.inflate(R.layout.card_favoritos, parentView, false);
 
         TextView t1 = convertView.findViewById(R.id.titulo);
         TextView t2 = convertView.findViewById(R.id.medida);
         TextView t3 = convertView.findViewById(R.id.MedidaLabel);
+        TextView t4 = convertView.findViewById(R.id.medida_luz);
+        ImageButton verEnMapa = convertView.findViewById(R.id.boton_ver_en_mapa);
+        TextView calle = convertView.findViewById(R.id.nombre_calle);
 
         t1.setText(child.getTitulo());
         if(child.getTipo().equals("WeatherObserved")){
@@ -73,6 +79,47 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
             t2.setText(child.getRuido());
             t3.setText("Noise: ");
         }
+        t4.setText(child.getLuminosidad());
+
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(activity.getBaseContext(), Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(Double.valueOf(child.getLatitud()), Double.valueOf(child.getLongitud()), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String address = addresses.get(0).getThoroughfare() + ", " + addresses.get(0).getFeatureName();
+        calle.setText(address);
+
+        final ConstraintLayout hiddenView;
+        hiddenView = convertView.findViewById(R.id.hidden_view);
+        final CardViewManage cardViewManage = new CardViewManage(activity.getBaseContext());
+
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hiddenView.getVisibility() == View.VISIBLE) {
+                    cardViewManage.collapse(hiddenView);
+
+                }else if(hiddenView.getVisibility() == View.GONE){
+                    cardViewManage.expand(hiddenView);
+
+
+                }
+            }
+        });
+
+        verEnMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(activity.getBaseContext(), "Mostrar sensor en el mapa", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        int actionState = ItemTouchHelper.ACTION_STATE_SWIPE;
+        convertView.start
 
         return convertView;
     }

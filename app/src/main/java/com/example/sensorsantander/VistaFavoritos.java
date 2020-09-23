@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,30 +18,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 
 
-
-
 import java.util.ArrayList;
 
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
-import presenters.SensorAppPresenter;
+import presenters.PresenterVistaFavoritos;
 import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
 
 
-public class VistaFavoritos extends AppCompatActivity implements View.OnClickListener, Interfaces_MVP.RequiredViewOps {
+public class VistaFavoritos extends AppCompatActivity implements View.OnClickListener, Interfaces_MVP.RequiredViewFavoritosOps {
 
-    private static Interfaces_MVP.ProvidedPresenterOps mPresenter;
+    private static Interfaces_MVP.ProvidedPresenterFavoritosOps mPresenter;
 
     private ArrayList<Parent> parents = new ArrayList<>();
 
     private CustomExpandableListAdapter mAdapter;
 
     private ExpandableListView expList;
-
-    private ArrayList<SensorAppPresenter> eliminables = new ArrayList<>();
 
     private ActionMode mActionMode;
     private SensorAmbiental sensorSelected;
@@ -54,11 +49,12 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_favoritos);
 
-        mPresenter = new SensorAppPresenter(this);
+        mPresenter = new PresenterVistaFavoritos(this);
 
         TinyDB tinydb = new TinyDB(this);
         parents = tinydb.getListParent("parents");
         expList = findViewById(R.id.list_view_favoritos);
+
 
 
         expList.setSelector(R.drawable.selector_list_item);
@@ -94,16 +90,6 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                 return false;
             }
         });
-
-        expList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(getActivityContext(), "Item Click", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
-
 
         mAdapter = new CustomExpandableListAdapter(this, parents);
         expList.setAdapter(mAdapter);
@@ -204,6 +190,7 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                             if (ExpandableListView.getPackedPositionType(packedPosition) ==
                                     ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                                 parents.remove(grupoSelected);
+                                VariablesGlobales.nombreGrupos.remove(grupoSelected.getNombre());
                             }
                             if (ExpandableListView.getPackedPositionType(packedPosition) ==
                                     ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
@@ -263,14 +250,20 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                     builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String m_Text = inputRename.getText().toString();
+                            String nombreViejo = grupoSelected.getNombre();
+                            String nombreNuevo = inputRename.getText().toString();
                             if (ExpandableListView.getPackedPositionType(packedPosition) ==
                                     ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                                grupoSelected.setNombre(m_Text);
+
+                                int index = VariablesGlobales.nombreGrupos.indexOf(nombreViejo);
+                                VariablesGlobales.nombreGrupos.set(index, nombreNuevo);
+
+                                grupoSelected.setNombre(nombreNuevo);
+
                             }
                             if (ExpandableListView.getPackedPositionType(packedPosition) ==
                                     ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                                sensorSelected.setTitulo(m_Text);
+                                sensorSelected.setTitulo(nombreNuevo);
                             }
                             mAdapter.setData(parents);
                         }

@@ -1,73 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_lista_favoritos"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/selector_list_item">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    cardView:cardCornerRadius="8dp"
+    cardView:cardElevation="8dp"
+    android:layout_margin="8dp">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginTop="2dp"
-        android:id="@+id/imageView"
-        android:cropToPadding="false"
-        android:src="@mipmap/sensoricon"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignBottom="@+id/titulo"
-        android:maxHeight="35dp"
-        android:maxWidth="74dp"
-        android:adjustViewBounds="true" />
-
-    <TextView
-        android:id="@+id/TituloLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/imageView"
-        android:layout_toRightOf="@+id/imageView"
-        android:text="Titulo: "
-        android:textSize="21sp" />
-
-    <TextView
-        android:id="@+id/MedidaLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/TituloLabel"
-        android:layout_toEndOf="@+id/imageView"
-        android:layout_toRightOf="@+id/imageView"
-        android:text="Medida: " />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card_view_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/titulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/TituloLabel"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/TituloLabel"
-        android:layout_toRightOf="@+id/TituloLabel"
-        android:text="Titulo sensor"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#f65034"
-        android:textSize="21sp" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:maxWidth="74dp"
+            android:maxHeight="35dp"
+            android:src="@mipmap/sensoricon"
+            cardView:layout_constraintStart_toStartOf="parent"
+            cardView:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/medida"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/titulo"
-        android:layout_alignBaseline="@id/MedidaLabel"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="37dp"
-        android:layout_toRightOf="@+id/MedidaLabel"
-        android:text="medida sensor" />
+        <TextView
+            android:id="@+id/TituloLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="8dp"
+            android:text="Nombre: "
+            android:textSize="21sp"
+            cardView:layout_constraintStart_toEndOf="@+id/imageView"
+            cardView:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/MedidaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:text="Medida: "
+            cardView:layout_constraintStart_toEndOf="@+id/imageView"
+            cardView:layout_constraintTop_toBottomOf="@+id/TituloLabel" />
+
+        <TextView
+            android:id="@+id/titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Titulo sensor"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#f65034"
+            android:textSize="21sp"
+            cardView:layout_constraintStart_toEndOf="@+id/TituloLabel"
+            cardView:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/medida"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="medida sensor"
+            cardView:layout_constraintStart_toEndOf="@+id/MedidaLabel"
+            cardView:layout_constraintTop_toBottomOf="@+id/titulo" />
 
 
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_view_hidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            cardView:layout_constraintBottom_toBottomOf="parent"
+            cardView:layout_constraintEnd_toEndOf="parent"
+            cardView:layout_constraintHorizontal_bias="0.0"
+            cardView:layout_constraintStart_toStartOf="parent"
+            cardView:layout_constraintTop_toBottomOf="@+id/card_view_show"
+            cardView:layout_constraintVertical_bias="1.0">
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/luz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="luz sensor"
+                tools:layout_editor_absoluteX="136dp"
+                tools:layout_editor_absoluteY="16dp" />
+
+            <TextView
+                android:id="@+id/luz_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Luminosidad: "
+                tools:layout_editor_absoluteX="49dp"
+                tools:layout_editor_absoluteY="16dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
