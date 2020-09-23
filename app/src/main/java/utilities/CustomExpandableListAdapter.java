@@ -118,9 +118,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
             }
         });
 
-        int actionState = ItemTouchHelper.ACTION_STATE_SWIPE;
-        convertView.start
-
         return convertView;
     }
 
