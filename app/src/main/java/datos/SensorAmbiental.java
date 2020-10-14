@@ -16,6 +16,7 @@ public class SensorAmbiental implements Serializable {
     private String uri;
 
     private String titulo;
+    private String direccion;
 
     public SensorAmbiental(){
 
@@ -122,5 +123,13 @@ public class SensorAmbiental implements Serializable {
 
     public String getTitulo() {
         return titulo;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 }

@@ -1,5 +1,8 @@
 package services;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -10,7 +13,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import datos.SensorAmbiental;
 import utilities.HttpHandler;
@@ -19,15 +23,14 @@ import utilities.Interfaces_MVP;
 
 public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
 
-    // Presenter reference
-    //private Interfaces_MVP.RequiredPresenterOps mPresenter;
-
     private static final String tag = SensorDataService.class.getSimpleName();
 
     ArrayList<SensorAmbiental> sensorAmbList;
 
-    public SensorDataService() {
+    Context context;
 
+    public SensorDataService(Context context) {
+        this.context = context;
     }
 
     public ArrayList<SensorAmbiental> getSensorData(){

@@ -3,7 +3,6 @@ package utilities;
 import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
-import android.widget.ExpandableListView;
 
 import com.google.android.gms.maps.GoogleMap;
 
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 
 import datos.Parent;
 import datos.SensorAmbiental;
+import presenters.PresenterVistaFavoritos;
 
 public interface Interfaces_MVP {
 
@@ -24,6 +24,7 @@ public interface Interfaces_MVP {
         void showConnectionNotAvailable();
         boolean menuFavoritos(MenuItem item, Activity activity);
         void onClickAddFavorito(SensorAmbiental sensor, String grupo);
+        void onClickAddAlarma(SensorAmbiental sensor, Double valor, String tipo, String nombre);
     }
 
     interface ProvidedPresenterMapaOps{
@@ -49,6 +50,7 @@ public interface Interfaces_MVP {
         Context getAppContext();
         Context getActivityContext();
         void addToGroup(Parent grupo);
+        PresenterVistaFavoritos getPresenter();
         void actionModeEditar();
     }
 

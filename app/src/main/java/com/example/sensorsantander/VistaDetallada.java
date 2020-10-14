@@ -132,6 +132,11 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
+    public PresenterVistaFavoritos getPresenter() {
+        return (PresenterVistaFavoritos) mPresenter;
+    }
+
+    @Override
     public void actionModeEditar() {
 
     }

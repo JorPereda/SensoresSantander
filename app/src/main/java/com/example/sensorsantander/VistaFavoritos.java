@@ -11,21 +11,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-
+import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 
+import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
 import utilities.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
+import utilities.SwipeDismissTouchListener;
 import utilities.TinyDB;
 
 
@@ -34,9 +37,9 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
     private static Interfaces_MVP.ProvidedPresenterFavoritosOps mPresenter;
 
     private ArrayList<Parent> parents = new ArrayList<>();
+    private ArrayList<Alarma> listaAlarmas = new ArrayList();
 
     private CustomExpandableListAdapter mAdapter;
-
     private ExpandableListView expList;
 
     private ActionMode mActionMode;
@@ -51,11 +54,13 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
 
         mPresenter = new PresenterVistaFavoritos(this);
 
+        //Alarma nuevaAlarma = new Alarma();
+
         TinyDB tinydb = new TinyDB(this);
         parents = tinydb.getListParent("parents");
+        tinydb.putListAlarmas("alarmas", listaAlarmas);
+
         expList = findViewById(R.id.list_view_favoritos);
-
-
 
         expList.setSelector(R.drawable.selector_list_item);
         expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -68,7 +73,7 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
 
                 int index = expList.getFlatListPosition(packedPosition);
 
-                /*  if group item clicked */
+                // if group item clicked //
                 if (ExpandableListView.getPackedPositionType(packedPosition) ==
                         ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                     expList.setItemChecked(index, true);
@@ -87,11 +92,13 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                     // return true as we are handling the event.
                     return true;
                 }
-                return false;
+                return true;
             }
         });
 
-        mAdapter = new CustomExpandableListAdapter(this, parents);
+
+        mAdapter = new CustomExpandableListAdapter(this, parents, this);
+
         expList.setAdapter(mAdapter);
 
     }
@@ -158,6 +165,11 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
     public void addToGroup(Parent grupo) {
         parents.add(grupo);
         mAdapter.setData(parents);
+    }
+
+    @Override
+    public PresenterVistaFavoritos getPresenter() {
+        return (PresenterVistaFavoritos) mPresenter;
     }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -250,10 +262,10 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                     builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String nombreViejo = grupoSelected.getNombre();
                             String nombreNuevo = inputRename.getText().toString();
                             if (ExpandableListView.getPackedPositionType(packedPosition) ==
                                     ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                                String nombreViejo = grupoSelected.getNombre();
 
                                 int index = VariablesGlobales.nombreGrupos.indexOf(nombreViejo);
                                 VariablesGlobales.nombreGrupos.set(index, nombreNuevo);

@@ -1,5 +1,7 @@
 package services;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,7 +10,8 @@ import datos.SensorAmbiental;
 public class SDS_ServerNotAvailable extends SensorDataService {
 
 
-    public SDS_ServerNotAvailable() {
+    public SDS_ServerNotAvailable(Context context) {
+        super(context);
 
     }
 

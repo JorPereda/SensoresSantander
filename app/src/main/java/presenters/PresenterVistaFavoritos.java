@@ -7,26 +7,22 @@ import android.content.Intent;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.sensorsantander.R;
+import com.example.sensorsantander.VistaAlarmas;
 import com.example.sensorsantander.VistaFavoritos;
 import com.example.sensorsantander.VistaMapa;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
+import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import services.SensorDataService;
+import utilities.CheckSensorAlarm;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
 
@@ -103,7 +99,7 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
 
     @Override
     public void getSensorData() {
-        sensorAmbList = new SensorDataService().getSensorData();
+        sensorAmbList = new SensorDataService(mView.getActivityContext()).getSensorData();
     }
 
 
@@ -126,6 +122,12 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
 
                 Intent abrirMapa = new Intent(mView.getActivityContext(), VistaMapa.class);
                 mView.getActivityContext().startActivity(abrirMapa);
+                return true;
+
+            case R.id.verAlarmas:
+
+                Intent verAlarmas = new Intent(mView.getActivityContext(), VistaAlarmas.class);
+                mView.getActivityContext().startActivity(verAlarmas);
                 return true;
 
             case R.id.action_add_element:
@@ -235,4 +237,25 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
 
     }
 
+    @Override
+    public void onClickAddAlarma(SensorAmbiental sensor, Double valor, String tipo, String nombre){
+        Context context = getActivityContext();
+        ArrayList<Alarma> alarmas = new ArrayList<>();
+
+        TinyDB tinydb = new TinyDB(mView.getAppContext());
+        alarmas = tinydb.getListAlarmas("alarmas");
+
+        Alarma nuevaAlarma = new Alarma(sensor, tipo, valor, nombre);
+        alarmas.add(nuevaAlarma);
+
+        tinydb.putListAlarmas("alarmas", alarmas);
+
+        Intent alarmIntent = new Intent(context, CheckSensorAlarm.class);
+        alarmIntent.putExtra("sensor", sensor);
+        new CheckSensorAlarm().onReceive(context, alarmIntent);
+
+        Intent intentVistaAlarmas = new Intent(context, VistaAlarmas.class);
+        mView.getActivityContext().startActivity(intentVistaAlarmas);
+
+    }
 }

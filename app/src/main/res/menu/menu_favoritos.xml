@@ -15,6 +15,11 @@
         android:orderInCategory="1"
         app:showAsAction="never" />
 
+    <item android:id="@+id/verAlarmas"
+        android:title="@string/ver_alarmas"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+
     <item android:id="@+id/editMode"
         android:title="@string/editMode"
         android:orderInCategory="2"

@@ -92,7 +92,7 @@ public class PresenterVistaMapa implements Interfaces_MVP.ProvidedPresenterMapaO
 
     @Override
     public void getSensorData() {
-        sensorAmbList = new SensorDataService().getSensorData();
+        sensorAmbList = new SensorDataService(mView.getActivityContext()).getSensorData();
     }
 
 

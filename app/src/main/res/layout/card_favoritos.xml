@@ -104,9 +104,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!--The following is the expandable portion whose
-                            visibility is initially set to 'gone'.
-                            The parent LinearLayout contains 3 child LinearLayouts
-                            that hold a subject name and an icon each.-->
+                            visibility is initially set to 'gone'.-->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/hidden_view"
                 android:layout_width="match_parent"
@@ -163,10 +161,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nombre de calle"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/spacer"
                     app:layout_constraintStart_toEndOf="@+id/boton_ver_en_mapa"
                     app:layout_constraintTop_toBottomOf="@id/medida_luz"
                     app:layout_constraintVertical_bias="0.562" />
+
+                <Space
+                    android:id="@+id/spacer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintTop_toBottomOf="@+id/boton_ver_en_mapa"
+                    />
+
+                <ImageButton
+                    android:id="@+id/boton_nueva_alarma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_add_alarm"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/spacer" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

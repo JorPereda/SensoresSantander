@@ -40,6 +40,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import datos.Alarma;
 import datos.Parent;
 
 
@@ -356,7 +357,6 @@ public class TinyDB {
         putListString(key, objStrings);
     }
 
-    //No need Class<?> mClass parameter. Because we know it is Player!
     public ArrayList<Parent> getListParent(String key){
         Gson gson = new Gson();
 
@@ -368,6 +368,29 @@ public class TinyDB {
             parents.add(parent);
         }
         return parents;
+    }
+
+    public void putListAlarmas(String key, ArrayList<Alarma> alarmas){
+        checkForNullKey(key);
+        Gson gson = new Gson();
+        ArrayList<String> objStrings = new ArrayList<String>();
+        for(Alarma alarma: alarmas){
+            objStrings.add(gson.toJson(alarma));
+        }
+        putListString(key, objStrings);
+    }
+
+    public ArrayList<Alarma> getListAlarmas(String key){
+        Gson gson = new Gson();
+
+        ArrayList<String> objStrings = getListString(key);
+        ArrayList<Alarma> alarmas =  new ArrayList<Alarma>();
+
+        for(String jObjString : objStrings){
+            Alarma alarma  = gson.fromJson(jObjString,  Alarma.class);
+            alarmas.add(alarma);
+        }
+        return alarmas;
     }
 
 
