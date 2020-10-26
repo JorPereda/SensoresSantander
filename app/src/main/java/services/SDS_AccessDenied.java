@@ -11,7 +11,7 @@ public class SDS_AccessDenied extends SensorDataService {
 
 
     public SDS_AccessDenied(Context context) {
-        super(context);
+        super();
 
     }
 

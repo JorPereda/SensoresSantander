@@ -49,4 +49,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation files('libs/gson-1.7.jar')
     implementation 'androidx.cardview:cardview:1.0.0'
+
 }

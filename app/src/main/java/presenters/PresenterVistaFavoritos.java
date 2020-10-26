@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,21 +17,23 @@ import com.example.sensorsantander.VistaFavoritos;
 import com.example.sensorsantander.VistaMapa;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
-import services.SensorDataService;
-import utilities.CheckSensorAlarm;
+import tasks.GetDataTotalTask;
 import utilities.Interfaces_MVP;
+import tasks.GetSensorUnicoTask;
 import utilities.TinyDB;
 
 
-public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenterFavoritosOps, Interfaces_MVP.RequiredPresenterOps {
+public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavoritos {
 
     // View reference.
-    private Interfaces_MVP.RequiredViewFavoritosOps mView;
+    private Interfaces_MVP.ViewFavoritosYAlarma mView;
 
     // Model reference (o service)
     private Interfaces_MVP.ProvidedModelOps svc;
@@ -40,47 +43,16 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
     private ArrayList<SensorAmbiental> sensorAmbList;
     private ArrayList<Parent> parents;
 
-    public PresenterVistaFavoritos(){
-        sensorAmbList = new ArrayList<>();
-    }
-
-    public PresenterVistaFavoritos(Interfaces_MVP.RequiredViewFavoritosOps view){
+    public PresenterVistaFavoritos(Interfaces_MVP.ViewFavoritosYAlarma view){
         mView = view;
         sensorAmbList = new ArrayList<>();
         parents = new ArrayList<>();
-        //TinyDB tinydb = new TinyDB(mView.getAppContext());
-        //parents = tinydb.getListParent("parents");
     }
 
     public PresenterVistaFavoritos(Interfaces_MVP.ProvidedModelOps svc){
         this.svc = svc;
         sensorAmbList = new ArrayList<>();
         parents = new ArrayList<>();
-        //parents = VariablesGlobales.parents;
-    }
-
-    /**
-     * @return  Application context
-     */
-    @Override
-    public Context getAppContext() {
-        try {
-            return getView().getAppContext();
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-
-    /**
-     * @return  Activity context
-     */
-    @Override
-    public Context getActivityContext() {
-        try {
-            return getView().getActivityContext();
-        } catch (NullPointerException e) {
-            return null;
-        }
     }
 
     public ArrayList<SensorAmbiental> getSensorAmbList() {
@@ -90,19 +62,6 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
     public void setSensorAmbList(ArrayList<SensorAmbiental> sensorAmbList) {
         this.sensorAmbList = sensorAmbList;
     }
-
-    @Override
-    public ArrayList<SensorAmbiental> showSensorData(){
-        getSensorData();
-        return sensorAmbList;
-    }
-
-    @Override
-    public void getSensorData() {
-        sensorAmbList = new SensorDataService(mView.getActivityContext()).getSensorData();
-    }
-
-
 
     @Override
     public void showServerNotAvailable() {
@@ -121,6 +80,7 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
             case R.id.irMapa:
 
                 Intent abrirMapa = new Intent(mView.getActivityContext(), VistaMapa.class);
+                abrirMapa.putExtra("listaSensores", sensorAmbList);
                 mView.getActivityContext().startActivity(abrirMapa);
                 return true;
 
@@ -182,7 +142,7 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
      * Return the View reference.
      * Throw an exception if the View is unavailable.
      */
-    private Interfaces_MVP.RequiredViewFavoritosOps getView() throws NullPointerException{
+    private Interfaces_MVP.ViewFavoritosYAlarma getView() throws NullPointerException{
         if ( mView != null )
             return mView;
         else
@@ -238,24 +198,40 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.ProvidedPresenter
     }
 
     @Override
-    public void onClickAddAlarma(SensorAmbiental sensor, Double valor, String tipo, String nombre){
-        Context context = getActivityContext();
-        ArrayList<Alarma> alarmas = new ArrayList<>();
+    public void onClickAddAlarma(SensorAmbiental sensor, Double valor, String tipo, String maxMin, String nombre){
+        final Context context = mView.getActivityContext();
+        ArrayList<Alarma> alarmas;
 
         TinyDB tinydb = new TinyDB(mView.getAppContext());
         alarmas = tinydb.getListAlarmas("alarmas");
 
-        Alarma nuevaAlarma = new Alarma(sensor, tipo, valor, nombre);
+        final Alarma nuevaAlarma = new Alarma(sensor, tipo, maxMin, valor, nombre);
         alarmas.add(nuevaAlarma);
-
         tinydb.putListAlarmas("alarmas", alarmas);
 
-        Intent alarmIntent = new Intent(context, CheckSensorAlarm.class);
-        alarmIntent.putExtra("sensor", sensor);
-        new CheckSensorAlarm().onReceive(context, alarmIntent);
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        final ArrayList<Alarma> finalAlarmas = alarmas;
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        new GetSensorUnicoTask(nuevaAlarma, finalAlarmas, mView).execute();
+                    }
+                });
+            }
+        };
+        timer.schedule(task, 0, 1000);//Cada minuto
 
         Intent intentVistaAlarmas = new Intent(context, VistaAlarmas.class);
         mView.getActivityContext().startActivity(intentVistaAlarmas);
 
     }
+
+    public void getListaSensores(){
+        new GetDataTotalTask(mView).execute();
+    }
+
+
 }

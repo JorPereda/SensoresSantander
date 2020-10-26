@@ -1,7 +1,5 @@
-package utilities;
+package adapters;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.location.Address;
@@ -9,21 +7,19 @@ import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.ItemTouchHelper;
 
 import com.example.sensorsantander.R;
-import com.example.sensorsantander.VistaFavoritos;
 import com.example.sensorsantander.VistaSensorUnicoMapa;
 
 import java.io.IOException;
@@ -33,21 +29,23 @@ import java.util.Locale;
 
 import datos.Parent;
 import datos.SensorAmbiental;
+import utilities.CardViewManage;
+import utilities.Interfaces_MVP;
+import utilities.TinyDB;
 
 
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     private ArrayList<Parent> parents;
-    public LayoutInflater inflater;
-    public Activity activity;
+    private LayoutInflater inflater;
     // View reference.
-    private Interfaces_MVP.RequiredViewFavoritosOps mView;
+    private Interfaces_MVP.ViewFavoritosYAlarma mView;
 
 
-    public CustomExpandableListAdapter(Activity act, ArrayList<Parent> parents, Interfaces_MVP.RequiredViewFavoritosOps view) {
-        activity = act;
+
+    public CustomExpandableListAdapter(ArrayList<Parent> parents, Interfaces_MVP.ViewFavoritosYAlarma view) {
         this.parents = parents;
-        inflater = act.getLayoutInflater();
+        inflater = LayoutInflater.from(view.getActivityContext());
         mView = view;
     }
 
@@ -64,7 +62,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public long getChildId(int groupPosition, int childPosition) {
-        return 0;
+        return childPosition;
     }
 
     @Override
@@ -99,7 +97,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         //Direccion del sensor
         Geocoder geocoder;
         List<Address> addresses = null;
-        geocoder = new Geocoder(activity.getBaseContext(), Locale.getDefault());
+        geocoder = new Geocoder(mView.getActivityContext(), Locale.getDefault());
         try {
             addresses = geocoder.getFromLocation(Double.valueOf(child.getLatitud()), Double.valueOf(child.getLongitud()), 1);
         } catch (IOException e) {
@@ -109,13 +107,13 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         calle.setText(address);
         child.setDireccion(address);
 
-        TinyDB tinydb = new TinyDB(activity.getBaseContext());
+        TinyDB tinydb = new TinyDB(mView.getActivityContext());
         tinydb.putListParent("parents", parents);
 
         //Parte desplegable de la card view
         final ConstraintLayout hiddenView;
         hiddenView = convertView.findViewById(R.id.hidden_view);
-        final CardViewManage cardViewManage = new CardViewManage(activity.getBaseContext());
+        final CardViewManage cardViewManage = new CardViewManage(mView.getActivityContext());
 
 
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -129,10 +127,57 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
             }
         });
 
+        final ExpandableListView expList = mView.getExpList();
+
+        expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                long packedPosition = expList.getExpandableListPosition(position);
+                mView.checkItemList(packedPosition);
+                return true;
+            }
+        });
+
         /*convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mView.actionModeEditar();
+                mView.checkItemList(groupPosition, childPosition);
+                return true;
+            }
+        });*/
+
+        /*expList = mView.getExpList();
+
+        expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                packedPosition = expList.getExpandableListPosition(position);
+
+                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+
+                int index = expList.getFlatListPosition(packedPosition);
+
+                // if group item clicked //
+                if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                        ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    expList.setItemChecked(index, true);
+                    grupoSelected = parents.get(groupPosition);
+                    mView.actionModeEditar();
+                    return true;
+                }
+
+                if (ExpandableListView.getPackedPositionType(packedPosition) ==
+                        ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+                    // handle data
+                    expList.setItemChecked(index, true);
+                    sensorSelected = parents.get(groupPosition).getChild(childPosition);
+                    mView.actionModeEditar();
+                    // return true as we are handling the event.
+                    return true;
+                }
                 return true;
             }
         });*/
@@ -141,29 +186,11 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         verEnMapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity.getBaseContext(), VistaSensorUnicoMapa.class);
+                Intent intent = new Intent(mView.getActivityContext(), VistaSensorUnicoMapa.class);
                 intent.putExtra("sensor", child);
-                activity.startActivity(intent);
+                mView.getActivityContext().startActivity(intent);
             }
         });
-
-
-        /*// Create a generic swipe-to-dismiss touch listener.
-        convertView.setOnTouchListener(new SwipeDismissTouchListener(
-                convertView,
-                null,
-                new SwipeDismissTouchListener.DismissCallbacks() {
-                    @Override
-                    public boolean canDismiss(Object token) {
-                        return true;
-                    }
-
-                    @Override
-                    public void onDismiss(View view, Object token) {
-                        Toast.makeText(activity.getBaseContext(), "Swipe funcioando", Toast.LENGTH_LONG).show();
-
-                    }
-                }));*/
 
         //Generar nueva alarma sobre un sensor
         final View finalConvertView = convertView;
@@ -182,26 +209,30 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 final EditText editTextNombre = dialogView.findViewById(R.id.nombre_alarma);
                 editTextNombre.setText(child.getTitulo());
 
-                final RadioGroup radioAlarma = dialogView.findViewById(R.id.opciones_alarma);
+                final RadioGroup radioTipoAlarma = dialogView.findViewById(R.id.opciones_alarma);
+                final RadioGroup radioMaxMinAlarma = dialogView.findViewById(R.id.opciones_max_min);
 
-                radioAlarma.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                    }
-                });
                 final Button botonAceptar = dialogView.findViewById(R.id.aceptarAlarmaButton);
                 botonAceptar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int selectedId = radioAlarma.getCheckedRadioButtonId();
+                        int selectedTipo = radioTipoAlarma.getCheckedRadioButtonId();
                         String tipoAlarma = "";
-                        if (selectedId == R.id.radio_temperatura) {
-                            tipoAlarma = "Temp. max: ";
-                        }else if (selectedId == R.id.radio_luz) {
-                            tipoAlarma = "Luz max: ";
-                        }else if (selectedId == R.id.radio_ruido) {
-                            tipoAlarma = "Ruido max: ";
+                        if (selectedTipo == R.id.radio_temperatura) {
+                            tipoAlarma = "temp";
+                        }else if (selectedTipo == R.id.radio_luz) {
+                            tipoAlarma = "luz";
+                        }else if (selectedTipo == R.id.radio_ruido) {
+                            tipoAlarma = "ruido";
+                        }
+
+                        int selectedMaxMin = radioMaxMinAlarma.getCheckedRadioButtonId();
+                        String maxMin = "";
+                        if (selectedMaxMin == R.id.radio_valor_min) {
+                            maxMin = "min";
+                        }else if (selectedMaxMin == R.id.radio_valor_max) {
+                            maxMin = "max";
                         }
 
                         String nombre = editTextNombre.getText().toString();
@@ -209,7 +240,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                             nombre = child.getTitulo();
                         }
                         Double valor = Double.valueOf(editTextMedida.getText().toString());
-                        mView.getPresenter().onClickAddAlarma(child, valor, tipoAlarma, nombre);
+                        mView.getPresenter().onClickAddAlarma(child, valor, tipoAlarma, maxMin, nombre);
                         alertDialog.dismiss();
                     }
                 });

@@ -1,79 +1,42 @@
 package presenters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.sensorsantander.R;
 import com.example.sensorsantander.VistaFavoritos;
-import com.example.sensorsantander.VistaMapa;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
-import datos.Parent;
 import datos.SensorAmbiental;
-import services.SensorDataService;
 import utilities.Interfaces_MVP;
 
-public class PresenterVistaMapa implements Interfaces_MVP.ProvidedPresenterMapaOps, Interfaces_MVP.RequiredPresenterOps {
+public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
 
     // View reference.
-    private Interfaces_MVP.RequiredViewMapaOps mView;
+    private Interfaces_MVP.ViewMapa mView;
 
     // Model reference (o service)
     private Interfaces_MVP.ProvidedModelOps svc;
 
 
-    private ArrayList<SensorAmbiental> sensorAmbList;
-    private ArrayList<Parent> parents;
+    private ArrayList<SensorAmbiental> sensorAmbList = new ArrayList<>();;
 
     public PresenterVistaMapa(){
         sensorAmbList = new ArrayList<>();
     }
 
-    public PresenterVistaMapa(Interfaces_MVP.RequiredViewMapaOps view){
+    public PresenterVistaMapa(Interfaces_MVP.ViewMapa view, ArrayList<SensorAmbiental> sensores){
         mView = view;
-        sensorAmbList = new ArrayList<>();
-        parents = new ArrayList<>();
-        //TinyDB tinydb = new TinyDB(mView.getAppContext());
-        //parents = tinydb.getListParent("parents");
+        sensorAmbList = sensores;
     }
 
     public PresenterVistaMapa(Interfaces_MVP.ProvidedModelOps svc){
         this.svc = svc;
-        sensorAmbList = new ArrayList<>();
-        parents = new ArrayList<>();
-        //parents = VariablesGlobales.parents;
-    }
-
-    /**
-     * @return  Application context
-     */
-    @Override
-    public Context getAppContext() {
-        try {
-            return getView().getAppContext();
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-
-    /**
-     * @return  Activity context
-     */
-    @Override
-    public Context getActivityContext() {
-        try {
-            return getView().getActivityContext();
-        } catch (NullPointerException e) {
-            return null;
-        }
     }
 
     public ArrayList<SensorAmbiental> getSensorAmbList() {
@@ -83,18 +46,6 @@ public class PresenterVistaMapa implements Interfaces_MVP.ProvidedPresenterMapaO
     public void setSensorAmbList(ArrayList<SensorAmbiental> sensorAmbList) {
         this.sensorAmbList = sensorAmbList;
     }
-
-    @Override
-    public ArrayList<SensorAmbiental> showSensorData(){
-        getSensorData();
-        return sensorAmbList;
-    }
-
-    @Override
-    public void getSensorData() {
-        sensorAmbList = new SensorDataService(mView.getActivityContext()).getSensorData();
-    }
-
 
 
     @Override
@@ -112,17 +63,17 @@ public class PresenterVistaMapa implements Interfaces_MVP.ProvidedPresenterMapaO
         TipoMapa tipo = new TipoMapa();
 
         switch (item.getItemId()) {
-            case R.id.action_refresh:
+            /*case R.id.action_refresh:
                 Toast.makeText(mView.getActivityContext(), "Refresh selected", Toast.LENGTH_SHORT).show();
                 tipo.mapaCompleto(map);
                 try {
-                    new VistaMapa.DatosAsyncTask().execute().get();
+                    new GetDataTotalTask(mView.).execute().get();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return true;
+                return true;*/
             case R.id.action_home:
                 Intent goFavs = new Intent(mView.getActivityContext(), VistaFavoritos.class);
                 mView.getActivityContext().startActivity(goFavs);
@@ -231,7 +182,7 @@ public class PresenterVistaMapa implements Interfaces_MVP.ProvidedPresenterMapaO
      * Return the View reference.
      * Throw an exception if the View is unavailable.
      */
-    private Interfaces_MVP.RequiredViewMapaOps getView() throws NullPointerException{
+    private Interfaces_MVP.ViewMapa getView() throws NullPointerException{
         if ( mView != null )
             return mView;
         else

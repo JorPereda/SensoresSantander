@@ -11,7 +11,7 @@ public class SDS_ServerNotAvailable extends SensorDataService {
 
 
     public SDS_ServerNotAvailable(Context context) {
-        super(context);
+        super();
 
     }
 

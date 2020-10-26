@@ -2,8 +2,6 @@ package datos;
 
 import java.util.ArrayList;
 
-import utilities.CustomExpandableListAdapter;
-
 public class VariablesGlobales {
 
     public static ArrayList<String> nombreGrupos = new ArrayList<>();

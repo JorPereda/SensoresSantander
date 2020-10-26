@@ -2,13 +2,9 @@ package com.example.sensorsantander;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,42 +20,34 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import datos.SensorAmbiental;
-import datos.VariablesGlobales;
 import presenters.PresenterVistaMapa;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
 
-public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.RequiredViewMapaOps, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
+public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.ViewMapa, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
-    private static Interfaces_MVP.ProvidedPresenterMapaOps mPresenter;
+    private static Interfaces_MVP.PresenterMapa mPresenter;
 
-    static ArrayList<SensorAmbiental> sensorAmbList;
-    static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();;
-
-    public static ArrayList<SensorAmbiental> getListaFavoritos() {
-        return listaFavoritos;
-    }
+    static ArrayList<SensorAmbiental> sensorAmbList = new ArrayList<>();
+    static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();
 
     private GoogleMap map;
-    private static ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_mapa);
 
-        progressBar = findViewById(R.id.progressBar);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        sensorAmbList = new ArrayList<>();
-        mPresenter = new PresenterVistaMapa(this);
+        Intent intent = getIntent();
+        sensorAmbList = (ArrayList<SensorAmbiental>) intent.getSerializableExtra("listaSensores");
+        mPresenter = new PresenterVistaMapa(this, sensorAmbList);
 
-
+/*
         //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
         //crear los marcadores para el mapa.
 
@@ -70,9 +58,13 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
+    }
+
+    public static ArrayList<SensorAmbiental> getListaFavoritos() {
+        return listaFavoritos;
     }
 
     @Override
@@ -88,36 +80,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     @Override
     public Context getAppContext() {
         return getApplicationContext();
-    }
-
-    public static class DatosAsyncTask extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-            progressBar.setProgress(0);
-            progressBar.bringToFront();
-        }
-
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            sensorAmbList = mPresenter.showSensorData();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            progressBar.setVisibility(View.GONE);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            progressBar.setProgress(values[0]);
-        }
-
     }
 
     @Override
@@ -175,7 +137,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        Toast.makeText(this ,"Descargando datos",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -187,7 +148,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.Requ
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_mapa, menu);
         return true;
     }
 

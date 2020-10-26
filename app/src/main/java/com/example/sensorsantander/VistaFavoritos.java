@@ -7,17 +7,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 
@@ -26,18 +22,18 @@ import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
-import utilities.CustomExpandableListAdapter;
+import adapters.CustomExpandableListAdapter;
 import utilities.Interfaces_MVP;
-import utilities.SwipeDismissTouchListener;
 import utilities.TinyDB;
 
 
-public class VistaFavoritos extends AppCompatActivity implements View.OnClickListener, Interfaces_MVP.RequiredViewFavoritosOps {
+public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.ViewFavoritosYAlarma {
 
-    private static Interfaces_MVP.ProvidedPresenterFavoritosOps mPresenter;
+    private static Interfaces_MVP.PresenterFavoritos mPresenter;
 
     private ArrayList<Parent> parents = new ArrayList<>();
     private ArrayList<Alarma> listaAlarmas = new ArrayList();
+    private ArrayList<SensorAmbiental> sensorAmbList;
 
     private CustomExpandableListAdapter mAdapter;
     private ExpandableListView expList;
@@ -53,17 +49,18 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.vista_favoritos);
 
         mPresenter = new PresenterVistaFavoritos(this);
+        mPresenter.getListaSensores();
 
         //Alarma nuevaAlarma = new Alarma();
 
         TinyDB tinydb = new TinyDB(this);
         parents = tinydb.getListParent("parents");
-        tinydb.putListAlarmas("alarmas", listaAlarmas);
+        listaAlarmas = tinydb.getListAlarmas("alarmas");
 
         expList = findViewById(R.id.list_view_favoritos);
 
         expList.setSelector(R.drawable.selector_list_item);
-        expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 packedPosition = expList.getExpandableListPosition(position);
@@ -94,12 +91,61 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
                 }
                 return true;
             }
-        });
+        });*/
 
 
-        mAdapter = new CustomExpandableListAdapter(this, parents, this);
+        mAdapter = new CustomExpandableListAdapter(parents, this);
 
         expList.setAdapter(mAdapter);
+
+    }
+
+    @Override
+    public ExpandableListView getExpList() {
+        return expList;
+    }
+
+    @Override
+    public void updateListAlarmas(ArrayList<Alarma> alarmas) {
+        this.listaAlarmas = alarmas;
+    }
+
+    @Override
+    public void updateListTotal(ArrayList<SensorAmbiental> sensorAmbList) {
+        this.sensorAmbList = sensorAmbList;
+    }
+
+    @Override
+    public boolean checkItemList(long packedPosition){
+
+        //packedPosition = expList.getExpandableListPosition(position);
+
+        int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+        int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+
+        int index = expList.getFlatListPosition(packedPosition);
+
+        // if group item clicked //
+        if (ExpandableListView.getPackedPositionType(groupPosition) ==
+                ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            expList.setItemChecked(index, true);
+            grupoSelected = parents.get(groupPosition);
+            actionModeEditar();
+            return true;
+        }
+
+        if (ExpandableListView.getPackedPositionType(childPosition) ==
+                ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+            // handle data
+            expList.setItemChecked(index, true);
+            sensorSelected = parents.get(groupPosition).getChild(childPosition);
+            actionModeEditar();
+            // return true as we are handling the event.
+            return true;
+        }
+        return true;
+
 
     }
 
@@ -148,10 +194,6 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onClick(View v) {
-    }
-
-    @Override
     public Context getActivityContext() {
         return this;
     }
@@ -190,6 +232,7 @@ public class VistaFavoritos extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
             switch (item.getItemId()) {
                 case R.id.delete:
                     final AlertDialog.Builder builderDelete = new AlertDialog.Builder(getActivityContext());

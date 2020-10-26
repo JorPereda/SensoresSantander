@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -15,15 +16,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
+import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
 import utilities.Interfaces_MVP;
 
-public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.RequiredViewFavoritosOps {
+public class VistaDetallada extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Interfaces_MVP.ViewFavoritosYAlarma {
 
-    private static Interfaces_MVP.ProvidedPresenterFavoritosOps mPresenter;
+    private static Interfaces_MVP.PresenterFavoritos mPresenter;
 
     private SensorAmbiental sensor;
 
@@ -137,7 +139,27 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
+    public void updateListTotal(ArrayList<SensorAmbiental> sensorAmbList) {
+
+    }
+
+    @Override
+    public boolean checkItemList(long packedPosition) {
+        return false;
+    }
+
+    @Override
     public void actionModeEditar() {
+
+    }
+
+    @Override
+    public ExpandableListView getExpList() {
+        return null;
+    }
+
+    @Override
+    public void updateListAlarmas(ArrayList<Alarma> alarmas) {
 
     }
 }

@@ -27,10 +27,7 @@ public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
 
     ArrayList<SensorAmbiental> sensorAmbList;
 
-    Context context;
-
-    public SensorDataService(Context context) {
-        this.context = context;
+    public SensorDataService() {
     }
 
     public ArrayList<SensorAmbiental> getSensorData(){
