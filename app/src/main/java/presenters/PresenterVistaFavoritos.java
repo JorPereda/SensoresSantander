@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 
@@ -25,6 +26,7 @@ import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import tasks.GetDataTotalTask;
+import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
 import tasks.GetSensorUnicoTask;
 import utilities.TinyDB;
@@ -41,12 +43,14 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
 
 
     private ArrayList<SensorAmbiental> sensorAmbList;
-    private ArrayList<Parent> parents;
+    private ArrayList<Parent> parents = new ArrayList<>();
 
     public PresenterVistaFavoritos(Interfaces_MVP.ViewFavoritosYAlarma view){
         mView = view;
         sensorAmbList = new ArrayList<>();
-        parents = new ArrayList<>();
+        TinyDB tinydb = new TinyDB(mView.getActivityContext());
+        parents = tinydb.getListParent("parents");
+        Log.d("Presenter parents: ", parents.toString());
     }
 
     public PresenterVistaFavoritos(Interfaces_MVP.ProvidedModelOps svc){
@@ -77,6 +81,13 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
     public boolean menuFavoritos(MenuItem item, Activity activity){
 
         switch (item.getItemId()) {
+            case R.id.action_refresh_list:
+                new UpdateFavoritosTask(parents, mView).execute();
+                mView.updateListView(parents);
+                Log.d("MenuFav1 parents: ", parents.toString());
+
+                return true;
+
             case R.id.irMapa:
 
                 Intent abrirMapa = new Intent(mView.getActivityContext(), VistaMapa.class);
@@ -122,12 +133,6 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
                 });
 
                 builder.show();
-
-                return true;
-
-            case R.id.editMode:
-
-                mView.actionModeEditar();
 
                 return true;
 
@@ -209,20 +214,8 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
         alarmas.add(nuevaAlarma);
         tinydb.putListAlarmas("alarmas", alarmas);
 
-        final Handler handler = new Handler();
-        Timer timer = new Timer();
-        final ArrayList<Alarma> finalAlarmas = alarmas;
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        new GetSensorUnicoTask(nuevaAlarma, finalAlarmas, mView).execute();
-                    }
-                });
-            }
-        };
-        timer.schedule(task, 0, 1000);//Cada minuto
+        new GetSensorUnicoTask(nuevaAlarma, alarmas, mView).execute();
+
 
         Intent intentVistaAlarmas = new Intent(context, VistaAlarmas.class);
         mView.getActivityContext().startActivity(intentVistaAlarmas);

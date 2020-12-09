@@ -15,23 +15,17 @@
         android:id="@+id/imagen_sensor_detalle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:src="@mipmap/sensoricon" />
 
     <TextView
         android:id="@+id/id_detalle_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imagen_sensor_detalle"
-        android:layout_alignParentLeft="true"
         android:text="@string/id_detalle" />
     <TextView
         android:id="@+id/id_detalle_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imagen_sensor_detalle"
-        android:layout_toRightOf="@+id/id_detalle_label"
-        android:layout_toEndOf="@+id/id_detalle_label"
         android:text="@string/id_detalle_valor" />
 
 
@@ -39,16 +33,11 @@
         android:id="@+id/temp_detalle_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/id_detalle_label"
-        android:layout_alignParentLeft="true"
         android:text="@string/temp_detalle" />
     <TextView
         android:id="@+id/temp_detalle_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/id_detalle_text"
-        android:layout_toRightOf="@+id/temp_detalle_label"
-        android:layout_toEndOf="@+id/temp_detalle_label"
         android:text="@string/temp_detalle_valor" />
 
 
@@ -56,16 +45,11 @@
         android:id="@+id/noise_detalle_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/temp_detalle_label"
-        android:layout_alignParentLeft="true"
         android:text="@string/noise_detalle" />
     <TextView
         android:id="@+id/noise_detalle_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/temp_detalle_text"
-        android:layout_toRightOf="@+id/noise_detalle_label"
-        android:layout_toEndOf="@+id/noise_detalle_label"
         android:text="@string/noise_detalle_valor" />
 
 
@@ -73,17 +57,24 @@
         android:id="@+id/light_detalle_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/noise_detalle_label"
-        android:layout_alignParentLeft="true"
         android:text="@string/light_detalle" />
     <TextView
         android:id="@+id/light_detalle_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/noise_detalle_text"
-        android:layout_toRightOf="@+id/light_detalle_label"
-        android:layout_toEndOf="@+id/light_detalle_label"
         android:text="@string/light_detalle_valor" />
+
+    <TextView
+        android:id="@+id/ult_modificacion_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ult. modificación:" />
+
+    <TextView
+        android:id="@+id/ult_modificacion_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ult. modificación:" />
 
     </LinearLayout>
     <LinearLayout

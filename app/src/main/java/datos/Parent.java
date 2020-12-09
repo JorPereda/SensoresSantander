@@ -1,17 +1,24 @@
 package datos;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 //Clase para elemento padre en lista desplegable
 public  class Parent{
 
+    private static final AtomicInteger count = new AtomicInteger(0);
+    private int idParent;
     private String nombre;
     // ArrayList to store child objects
     private ArrayList<SensorAmbiental> children = new ArrayList<SensorAmbiental>();
 
     public Parent(String nombre) {
+        this.idParent = count.incrementAndGet();
         this.nombre = nombre;
+    }
+    public int getIdParent() {
+        return idParent;
     }
 
     public String getNombre() {
@@ -44,6 +51,14 @@ public  class Parent{
 
     public void removeChild(SensorAmbiental child) {
         children.remove(child);
+    }
+
+    public void updateChild(SensorAmbiental child){
+        for (SensorAmbiental sensor : children){
+            if (sensor.getIdentificador().equals(child.getIdentificador())){
+                children.set(children.indexOf(sensor), child);
+            }
+        }
     }
 
 

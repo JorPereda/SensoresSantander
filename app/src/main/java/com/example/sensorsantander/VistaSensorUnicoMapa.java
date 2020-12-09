@@ -19,7 +19,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import datos.SensorAmbiental;
 
-import presenters.PresenterVistaMapa;
 import utilities.Interfaces_MVP;
 
 public class VistaSensorUnicoMapa extends AppCompatActivity implements Interfaces_MVP.ViewMapa, GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
@@ -86,6 +85,11 @@ public class VistaSensorUnicoMapa extends AppCompatActivity implements Interface
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void dialogFiltrarFechas() {
+        //return Long.parseLong(null);
     }
 
     @Override

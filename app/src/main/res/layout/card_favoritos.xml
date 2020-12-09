@@ -186,6 +186,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/spacer" />
 
+                <ImageButton
+                    android:id="@+id/boton_eliminar_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_delete"
+                    app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

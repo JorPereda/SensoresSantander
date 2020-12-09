@@ -58,7 +58,7 @@ public class SensorDataService implements Interfaces_MVP.ProvidedModelOps {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 //Se inicializa la lista una vez sabido que el codigo es correcto, para comprobar que la lista es null en caso contrario
                 sensorAmbList = new ArrayList<>();
-                Log.e(tag, "Response from url: " + jsonStr);
+                //Log.e(tag, "Response from url: " + jsonStr);
                     try {
                         JSONObject jsonObj = new JSONObject(jsonStr);
 

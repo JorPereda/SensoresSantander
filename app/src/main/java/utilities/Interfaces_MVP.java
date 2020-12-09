@@ -7,7 +7,6 @@ import android.widget.ExpandableListView;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 
 import datos.Alarma;
@@ -51,14 +50,19 @@ public interface Interfaces_MVP {
         Context getActivityContext();
         void addToGroup(Parent grupo);
         PresenterVistaFavoritos getPresenter();
-        boolean checkItemList(long packedPosition);
+        boolean checkItemList(int indexChild, int indexGroup);
         void actionModeEditar();
         ExpandableListView getExpList();
+        void updateParentInList(Parent parent);
+        void updateListParents(ArrayList<Parent> parents);
         void updateListAlarmas(ArrayList<Alarma> alarmas);
+        void updateAlarmInList(Alarma alarma);
         void updateListTotal(ArrayList<SensorAmbiental> sensorAmbList);
+        void updateListView(ArrayList<Parent> parents);
     }
 
     interface ViewMapa {
+        void dialogFiltrarFechas();
         Context getAppContext();
         Context getActivityContext();
     }

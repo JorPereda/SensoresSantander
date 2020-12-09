@@ -4,6 +4,13 @@
     tools:context="com.example.sensorsantander.VistaFavoritos">
 
     <item
+        android:id="@+id/action_refresh_list"
+        android:orderInCategory="1"
+        android:title="Refresh"
+        android:icon="@drawable/ic_baseline_refresh_24"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_add_element"
         android:orderInCategory="1"
         android:title="Add Element"
@@ -20,11 +27,11 @@
         android:orderInCategory="1"
         app:showAsAction="never" />
 
-    <item android:id="@+id/editMode"
+    <!--<item android:id="@+id/editMode"
         android:title="@string/editMode"
         android:orderInCategory="2"
         android:icon="@mipmap/edit"
-        app:showAsAction="always" />
+        app:showAsAction="always" />-->
 
 
 

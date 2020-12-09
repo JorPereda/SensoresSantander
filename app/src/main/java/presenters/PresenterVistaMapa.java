@@ -1,19 +1,21 @@
 package presenters;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.sensorsantander.R;
 import com.example.sensorsantander.VistaFavoritos;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import datos.SensorAmbiental;
 import utilities.Interfaces_MVP;
+import utilities.TipoMapa;
+
+import static android.content.ContentValues.TAG;
 
 public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
 
@@ -24,27 +26,11 @@ public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
     private Interfaces_MVP.ProvidedModelOps svc;
 
 
-    private ArrayList<SensorAmbiental> sensorAmbList = new ArrayList<>();;
-
-    public PresenterVistaMapa(){
-        sensorAmbList = new ArrayList<>();
-    }
+    private ArrayList<SensorAmbiental> sensorAmbList;
 
     public PresenterVistaMapa(Interfaces_MVP.ViewMapa view, ArrayList<SensorAmbiental> sensores){
         mView = view;
         sensorAmbList = sensores;
-    }
-
-    public PresenterVistaMapa(Interfaces_MVP.ProvidedModelOps svc){
-        this.svc = svc;
-    }
-
-    public ArrayList<SensorAmbiental> getSensorAmbList() {
-        return sensorAmbList;
-    }
-
-    public void setSensorAmbList(ArrayList<SensorAmbiental> sensorAmbList) {
-        this.sensorAmbList = sensorAmbList;
     }
 
 
@@ -60,7 +46,7 @@ public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
 
     @Override
     public boolean menuMapa(MenuItem item, GoogleMap map) {
-        TipoMapa tipo = new TipoMapa();
+        TipoMapa tipo = new TipoMapa(sensorAmbList);
 
         switch (item.getItemId()) {
             /*case R.id.action_refresh:
@@ -74,6 +60,12 @@ public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
                     e.printStackTrace();
                 }
                 return true;*/
+            case R.id.filtro_fecha:
+                //long fechaSeleccionada =
+                mView.dialogFiltrarFechas();
+                //tipo.mapaFiltroFecha(map, fechaSeleccionada);
+                //Log.d(TAG, "Date Year calendario en case: "+ fechaSeleccionada);
+                return true;
             case R.id.action_home:
                 Intent goFavs = new Intent(mView.getActivityContext(), VistaFavoritos.class);
                 mView.getActivityContext().startActivity(goFavs);
@@ -95,88 +87,6 @@ public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
         }
     }
 
-
-    public class TipoMapa{
-
-        public void mapaCompleto(GoogleMap googleMap){
-            String latitud;
-            String longitud;
-            String tipo;
-            String id;
-            LatLng marcador = null;
-
-            for(SensorAmbiental s: sensorAmbList) {
-                latitud = s.getLatitud();
-                longitud = s.getLongitud();
-                tipo = s.getTipo();
-                id = s.getIdentificador();
-
-                marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-
-                if(tipo.equals("WeatherObserved")){
-                    googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                }
-                if(tipo.equals("NoiseLevelObserved")){
-                    googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                }
-            }
-        }
-
-        public void mapaWeather(GoogleMap googleMap){
-            googleMap.clear();
-            String latitud;
-            String longitud;
-            String tipo;
-            String id;
-            LatLng marcador = null;
-
-            for(SensorAmbiental s: sensorAmbList) {
-                latitud = s.getLatitud();
-                longitud = s.getLongitud();
-                tipo = s.getTipo();
-                id = s.getIdentificador();
-
-                marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-
-                if(tipo.equals("WeatherObserved")){
-                    googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                }
-            }
-        }
-
-        public void mapaRuido(GoogleMap googleMap){
-            googleMap.clear();
-            String latitud;
-            String longitud;
-            String tipo;
-            String id;
-            LatLng marcador = null;
-
-            for(SensorAmbiental s: sensorAmbList) {
-                latitud = s.getLatitud();
-                longitud = s.getLongitud();
-                tipo = s.getTipo();
-                id = s.getIdentificador();
-
-                marcador = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
-
-                if(tipo.equals("NoiseLevelObserved")){
-                    googleMap.addMarker(new MarkerOptions().position(marcador).title(tipo + id).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                }
-            }
-        }
-
-        public void mapaIndividual(GoogleMap googleMap, SensorAmbiental sensor){
-
-            LatLng marcador;
-
-            marcador = new LatLng(Double.valueOf(sensor.getLatitud()), Double.valueOf(sensor.getLongitud()));
-
-            googleMap.addMarker(new MarkerOptions().position(marcador).title(sensor.getTitulo()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-
-
-        }
-    }
 
     /**
      * Return the View reference.

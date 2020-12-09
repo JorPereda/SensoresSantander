@@ -1,9 +1,12 @@
 package adapters;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,8 @@ import java.util.Locale;
 
 import datos.Parent;
 import datos.SensorAmbiental;
+import datos.VariablesGlobales;
+import tasks.UpdateFavoritosTask;
 import utilities.CardViewManage;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
@@ -81,6 +86,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         ImageButton verEnMapa = convertView.findViewById(R.id.boton_ver_en_mapa);
         TextView calle = convertView.findViewById(R.id.nombre_calle);
         ImageButton botonAlarma = convertView.findViewById(R.id.boton_nueva_alarma);
+        ImageButton botonEliminar = convertView.findViewById(R.id.boton_eliminar_fav);
 
         t1.setText(child.getTitulo());
         if(child.getTipo().equals("WeatherObserved")){
@@ -129,58 +135,19 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         final ExpandableListView expList = mView.getExpList();
 
-        expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onLongClick(View v) {
+                int indexChild = expList.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+                int indexGroup = expList.getFlatListPosition(ExpandableListView.getPackedPositionForGroup(groupPosition));
+                long packedPosition = expList.getExpandableListPosition(childPosition);
+                mView.checkItemList(indexChild, indexGroup);
+                //Log.d("Seleccion child: ", String.valueOf(indexChild));
+                //Log.d("Seleccion group: ", String.valueOf(indexGroup));
 
-                long packedPosition = expList.getExpandableListPosition(position);
-                mView.checkItemList(packedPosition);
                 return true;
             }
         });
-
-        /*convertView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mView.checkItemList(groupPosition, childPosition);
-                return true;
-            }
-        });*/
-
-        /*expList = mView.getExpList();
-
-        expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                packedPosition = expList.getExpandableListPosition(position);
-
-                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
-
-                int index = expList.getFlatListPosition(packedPosition);
-
-                // if group item clicked //
-                if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                        ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                    expList.setItemChecked(index, true);
-                    grupoSelected = parents.get(groupPosition);
-                    mView.actionModeEditar();
-                    return true;
-                }
-
-                if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                        ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-
-                    // handle data
-                    expList.setItemChecked(index, true);
-                    sensorSelected = parents.get(groupPosition).getChild(childPosition);
-                    mView.actionModeEditar();
-                    // return true as we are handling the event.
-                    return true;
-                }
-                return true;
-            }
-        });*/
 
         //Boton para mostrar el sensor unico en un mapa
         verEnMapa.setOnClickListener(new View.OnClickListener() {
@@ -247,6 +214,32 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
             }
         });
 
+        botonEliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder builderDeleteFav = new AlertDialog.Builder(mView.getActivityContext());
+                builderDeleteFav.setTitle("¿Realmente deseas eliminar el sensor?");
+
+                // Set up the buttons
+                builderDeleteFav.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        parent.removeChild(child);
+                        notifyDataSetChanged();
+                        mView.updateListView(parents);
+                        dialog.dismiss();
+                    }
+                });
+                builderDeleteFav.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builderDeleteFav.show();
+            }
+        });
+
 
         return convertView;
     }
@@ -294,6 +287,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         parentName.setText(parent.getNombre());
 
+        //new UpdateFavoritosTask(parent).execute();
 
         return convertView;
     }

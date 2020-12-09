@@ -1,27 +1,34 @@
 package com.example.sensorsantander;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
+import adapters.ListAlarmasRegistradasAdapter;
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import presenters.PresenterVistaFavoritos;
 import tasks.CompruebaAlarmaTask;
+import tasks.LimpiezaAlarmasTask;
 import utilities.Interfaces_MVP;
 import adapters.ListAlarmasAdapter;
 import utilities.TinyDB;
@@ -31,10 +38,7 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
     private static final String CHANNEL_ID = "1";
     private ListView listaAlarmasListView;
     private ListAlarmasAdapter mAdapter;
-    private ArrayList<Alarma> listaAlarmas;
-    private ArrayList<Alarma> alarmasSaltadas;
-    private TextView mTextView;
-
+    private ArrayList<Alarma> listaAlarmas = new ArrayList<>();
 
     private static Interfaces_MVP.PresenterFavoritos mPresenter;
 
@@ -43,55 +47,26 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_alarmas);
 
+        Intent intent = getIntent();
+        String nombreAlarmaNotificacion =  intent.getStringExtra("nombre");
+
         mPresenter = new PresenterVistaFavoritos(this);
 
         TinyDB tinydb = new TinyDB(this);
         listaAlarmas = tinydb.getListAlarmas("alarmas");
 
         listaAlarmasListView = findViewById(R.id.lista_alarmas);
-        TextView emptyText = (TextView)findViewById(android.R.id.empty);
+        TextView emptyText = findViewById(android.R.id.empty);
         listaAlarmasListView.setEmptyView(emptyText);
 
-        mAdapter = new ListAlarmasAdapter(listaAlarmas, this);
+        mAdapter = new ListAlarmasAdapter(listaAlarmas, nombreAlarmaNotificacion, this);
         listaAlarmasListView.setAdapter(mAdapter);
 
-        mTextView = findViewById(R.id.alarma_activada_nombre1);
         for(Alarma alarma : listaAlarmas){
-           // new CompruebaAlarmaTask(alarma, mTextView).execute();
+            new LimpiezaAlarmasTask(this, alarma).execute();
         }
-        createNotificationChannel();
-        addNotification();
-    }
-
-    private void addNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_add_alarm)
-                .setContentTitle("My notification")
-                .setContentText("Much longer text that cannot fit one line...")
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("Much longer text that cannot fit one line..."))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(8, builder.build());
 
 
-    }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Nombre del canal";
-            String description = "Descripcion";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 
     @Override
@@ -138,7 +113,7 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
     }
 
     @Override
-    public boolean checkItemList(long packedPosition) {
+    public boolean checkItemList(int indexChild, int indexGroup) {
         return false;
     }
 
@@ -153,12 +128,36 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
     }
 
     @Override
+    public void updateParentInList(Parent parent) {
+
+    }
+
+    @Override
+    public void updateListParents(ArrayList<Parent> parents) {
+
+    }
+
+    @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
         this.listaAlarmas = alarmas;
     }
 
     @Override
+    public void updateAlarmInList(Alarma alarma) {
+        this.listaAlarmas.set(listaAlarmas.indexOf(alarma), alarma);
+        TinyDB tinydb = new TinyDB(this);
+        tinydb.putListAlarmas("alarmas", listaAlarmas);
+
+
+    }
+
+    @Override
     public void updateListTotal(ArrayList<SensorAmbiental> sensorAmbList) {
 
+    }
+
+    @Override
+    public void updateListView(ArrayList<Parent> parents) {
+        mAdapter.notifyDataSetChanged();
     }
 }

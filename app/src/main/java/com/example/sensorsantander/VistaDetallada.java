@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
@@ -93,11 +94,17 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
         TextView tempTV = findViewById(R.id.temp_detalle_text);
         TextView noiseTV = findViewById(R.id.noise_detalle_text);
         TextView lightTV = findViewById(R.id.light_detalle_text);
+        TextView ultModTV = findViewById(R.id.ult_modificacion_text);
 
         idTV.setText(id);
         tempTV.setText(temperatura);
         noiseTV.setText(ruido);
         lightTV.setText(luminosidad);
+        String year = ultMod.substring(0,4);
+        String mes = ultMod.substring(5,7);
+        String dia = ultMod.substring(8,10);
+        String hora = ultMod.substring(11,16);
+        ultModTV.setText(dia+"/"+mes+"/"+year+" "+hora);
     }
 
     @Override
@@ -144,7 +151,12 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
-    public boolean checkItemList(long packedPosition) {
+    public void updateListView(ArrayList<Parent> parents) {
+
+    }
+
+    @Override
+    public boolean checkItemList(int indexChild, int indexGroup) {
         return false;
     }
 
@@ -159,7 +171,22 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
+    public void updateParentInList(Parent parent) {
+
+    }
+
+    @Override
+    public void updateListParents(ArrayList<Parent> parents) {
+
+    }
+
+    @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
+
+    }
+
+    @Override
+    public void updateAlarmInList(Alarma alarma) {
 
     }
 }

@@ -10,6 +10,14 @@
         android:icon="@mipmap/home"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/filtro_fecha"
+        android:orderInCategory="2"
+        android:icon="@drawable/ic_baseline_date_range_24"
+        android:title="Filtrar fecha"
+        app:showAsAction="always"
+        />
+
     <item android:id="@+id/todos"
         android:title="@string/todos"
         android:orderInCategory="1"

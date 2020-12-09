@@ -72,9 +72,10 @@ public class GetSensorUnicoTask extends AsyncTask<Void, Void, SensorAmbiental> {
                         sensor.setLuminosidad(luminosidad);
                         sensor.setTemperatura(temperatura);
                         sensor.setUltModificacion(ultMod);
-                        Log.e(tag, "Comprobacion de datos del sensor: - Ruido: " + ruido);
-                        Log.e(tag, "Comprobacion de datos del sensor: - Luz: " + luminosidad);
-                        Log.e(tag, "Comprobacion de datos del sensor: - Temp: " + temperatura);
+                        Log.e(tag, "Comprobacion de datos del sensor: ID: " + sensor.getIdentificador());
+                        Log.e(tag, "- Ruido: " + ruido);
+                        Log.e(tag, "- Luz: " + luminosidad);
+                        Log.e(tag, "- Temp: " + temperatura);
 
                     }
                 } catch (final JSONException e) {
@@ -92,10 +93,15 @@ public class GetSensorUnicoTask extends AsyncTask<Void, Void, SensorAmbiental> {
     @Override
     protected void onPostExecute(SensorAmbiental sensor) {
         super.onPostExecute(sensor);
-
-        listaAlarmas.get(alarma.getIdAlarma()).setSensor(sensor);
+        int id = alarma.getIdAlarma();
+        for(int i=0; i<listaAlarmas.size(); i++){
+            Alarma a = listaAlarmas.get(i);
+            if(a.getIdAlarma()==id){
+                a.setSensor(sensor);
+            }
+        }
+        //listaAlarmas.get(alarma.getIdAlarma()).setSensor(sensor);
         mView.updateListAlarmas(listaAlarmas);
-        new CompruebaAlarmaTask(alarma).execute();
 
     }
 }

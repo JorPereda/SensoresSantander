@@ -2,11 +2,18 @@ package com.example.sensorsantander;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CalendarView;
 
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,15 +32,19 @@ import datos.SensorAmbiental;
 import presenters.PresenterVistaMapa;
 import utilities.CustomMarkerInfoWindowView;
 import utilities.Interfaces_MVP;
+import utilities.TipoMapa;
+
+import static android.content.ContentValues.TAG;
 
 public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.ViewMapa, GoogleMap.OnMarkerClickListener, OnMapReadyCallback{
 
     private static Interfaces_MVP.PresenterMapa mPresenter;
 
     static ArrayList<SensorAmbiental> sensorAmbList = new ArrayList<>();
-    static ArrayList<SensorAmbiental> listaFavoritos = new ArrayList<>();
 
     private GoogleMap map;
+
+    private long selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +74,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
 
     }
 
-    public static ArrayList<SensorAmbiental> getListaFavoritos() {
-        return listaFavoritos;
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -86,6 +93,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         googleMap.setInfoWindowAdapter(new CustomMarkerInfoWindowView(this));
+        googleMap.clear();
 
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -114,6 +122,8 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
         String id;
         LatLng marcador = null;
 
+        googleMap.clear();
+
         for (SensorAmbiental s : sensorAmbList) {
             latitud = s.getLatitud();
             longitud = s.getLongitud();
@@ -137,6 +147,54 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
                 .build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void dialogFiltrarFechas(){
+        long fechaDelCalendario;
+
+        final Integer[] fecha = new Integer[3];
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View customLayout = getLayoutInflater().inflate(R.layout.filter_mapa_fecha_dialog, null);
+        builder.setView(customLayout);
+
+        final CalendarView simpleCalendarView = (CalendarView) customLayout.findViewById(R.id.simpleCalendarView); // get the reference of CalendarView
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        Button botonAceptar = customLayout.findViewById(R.id.button_ok_filtro_fecha);
+
+        final TipoMapa tipo = new TipoMapa(sensorAmbList);
+
+
+        botonAceptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //fechaDelCalendario = simpleCalendarView.getDate();
+                setSelectedDate(simpleCalendarView.getDate()); // get selected date in milliseconds
+                Log.d(TAG, "Date Year calendario: "+ getSelectedDate());
+                tipo.mapaFiltroFecha(map, getSelectedDate());
+                //setSelectedDate(selectedDate);
+                dialog.dismiss();
+            }
+        });
+        Log.d(TAG, "Date Year calendario fuera de boton: "+ getSelectedDate());
+
+        //TipoMapa tipo = new TipoMapa(sensorAmbList);
+        //return getSelectedDate();
+
+    }
+
+    public long getSelectedDate() {
+        return selectedDate;
+    }
+
+    public void setSelectedDate(long selectedDate) {
+        this.selectedDate = selectedDate;
     }
 
     @Override
