@@ -6,6 +6,7 @@ import android.database.DataSetObserver;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.Image;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -86,6 +88,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         ImageButton verEnMapa = convertView.findViewById(R.id.boton_ver_en_mapa);
         TextView calle = convertView.findViewById(R.id.nombre_calle);
         ImageButton botonAlarma = convertView.findViewById(R.id.boton_nueva_alarma);
+        ImageButton botonRename = convertView.findViewById(R.id.boton_rename_fav);
+        ImageButton botonShare = convertView.findViewById(R.id.boton_share_fav);
         ImageButton botonEliminar = convertView.findViewById(R.id.boton_eliminar_fav);
 
         t1.setText(child.getTitulo());
@@ -130,22 +134,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 }else if(hiddenView.getVisibility() == View.GONE){
                     cardViewManage.expand(hiddenView);
                 }
-            }
-        });
-
-        final ExpandableListView expList = mView.getExpList();
-
-        convertView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int indexChild = expList.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
-                int indexGroup = expList.getFlatListPosition(ExpandableListView.getPackedPositionForGroup(groupPosition));
-                long packedPosition = expList.getExpandableListPosition(childPosition);
-                mView.checkItemList(indexChild, indexGroup);
-                //Log.d("Seleccion child: ", String.valueOf(indexChild));
-                //Log.d("Seleccion group: ", String.valueOf(indexGroup));
-
-                return true;
             }
         });
 
@@ -211,6 +199,59 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                         alertDialog.dismiss();
                     }
                 });
+            }
+        });
+
+        botonRename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(mView.getActivityContext());
+                builder.setTitle("Introduce el nuevo nombre:");
+
+                // Set up the input
+                final EditText inputRename = new EditText(mView.getActivityContext());
+                // Specify the type of input expected; this
+                inputRename.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(inputRename);
+
+                // Set up the buttons
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nombreNuevo = inputRename.getText().toString();
+                        child.setTitulo(nombreNuevo);
+                        setData(parents);
+                    }
+                });
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+        botonShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(Intent.ACTION_SEND);
+                myIntent.setType("text/plain");
+                String shareBody = "";
+                if(child.getTipo().equals("WeatherObserved")){
+                    shareBody = child.getTitulo() + "\n" + "Temp: " + child.getTemperatura() +
+                            "\n" + "https://maps.google.com/?q=" + child.getLatitud() + "," + child.getLongitud();
+                }
+                if(child.getTipo().equals("NoiseLevelObserved")){
+                    shareBody = child.getTitulo() + "\n" + "Noise: " + child.getRuido() +
+                            "\n" + "https://maps.google.com/?q=" + child.getLatitud() + "," + child.getLongitud();
+                }
+                String shareSub = "Your subject";
+                myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+                myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                mView.getActivityContext().startActivity(Intent.createChooser(myIntent, "Share using"));
             }
         });
 
@@ -287,7 +328,26 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         parentName.setText(parent.getNombre());
 
-        //new UpdateFavoritosTask(parent).execute();
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mView.getExpList().isGroupExpanded(groupPosition)){
+                    mView.getExpList().collapseGroup(groupPosition);
+                }else{
+                    mView.getExpList().expandGroup(groupPosition);
+                }
+            }
+        });
+
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast toast = Toast.makeText(mView.getActivityContext(), "Boton apretado", Toast.LENGTH_SHORT);
+                toast.show();
+                mView.actionModeEditar(groupPosition);
+                return true;
+            }
+        });
 
         return convertView;
     }
@@ -307,5 +367,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public void registerDataSetObserver(DataSetObserver observer) {
         super.registerDataSetObserver(observer);
     }
+
 
 }

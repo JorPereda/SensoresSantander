@@ -5,10 +5,6 @@
         android:icon="@drawable/ic_delete"
         android:title="Borrar" />
     <item
-        android:id="@+id/share"
-        android:icon="@drawable/ic_share"
-        android:title="Compartir" />
-    <item
         android:id="@+id/rename"
         android:icon="@drawable/ic_text_format"
         android:title="Renombrar" />

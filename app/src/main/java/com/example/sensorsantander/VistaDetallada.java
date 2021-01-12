@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import datos.Alarma;
-import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
@@ -156,18 +155,23 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
-    public boolean checkItemList(int indexChild, int indexGroup) {
-        return false;
-    }
-
-    @Override
-    public void actionModeEditar() {
+    public void actionModeEditar(int groupPosition) {
 
     }
 
     @Override
     public ExpandableListView getExpList() {
         return null;
+    }
+
+    @Override
+    public void onStartService() {
+
+    }
+
+    @Override
+    public void refreshScreen() {
+
     }
 
     @Override

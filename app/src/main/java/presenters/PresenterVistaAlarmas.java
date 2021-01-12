@@ -1,6 +1,14 @@
 package presenters;
 
+import android.content.Intent;
+import android.view.MenuItem;
+
+import com.example.sensorsantander.R;
+import com.example.sensorsantander.VistaFavoritos;
+
+
 import utilities.Interfaces_MVP;
+
 
 public class PresenterVistaAlarmas implements Interfaces_MVP.PresenterAlarma {
 
@@ -13,6 +21,17 @@ public class PresenterVistaAlarmas implements Interfaces_MVP.PresenterAlarma {
     }
 
 
+    @Override
+    public boolean menuAlarmas(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_home_alarma) {
+            Intent goFavs = new Intent(mView.getActivityContext(), VistaFavoritos.class);
+            goFavs.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mView.getActivityContext().startActivity(goFavs);
+            return true;
+        }
+        return false;
+    }
 
 
     /**

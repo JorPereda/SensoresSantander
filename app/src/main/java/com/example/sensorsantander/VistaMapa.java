@@ -58,20 +58,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
         sensorAmbList = (ArrayList<SensorAmbiental>) intent.getSerializableExtra("listaSensores");
         mPresenter = new PresenterVistaMapa(this, sensorAmbList);
 
-/*
-        //Necesario el ".get" para que la aplicacion espere a tener los datos cargados y pueda
-        //crear los marcadores para el mapa.
-
-        try {
-            new DatosAsyncTask().execute().get();
-            VariablesGlobales.listaSensoresCompleta = sensorAmbList;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-
     }
 
     @Override

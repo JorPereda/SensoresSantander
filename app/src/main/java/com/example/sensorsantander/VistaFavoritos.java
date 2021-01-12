@@ -1,45 +1,35 @@
 package com.example.sensorsantander;
 
-import android.content.ComponentName;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Parcelable;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import datos.Alarma;
-import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
 import adapters.CustomExpandableListAdapter;
-import services.AlarmasService;
-import tasks.CompruebaAlarmaTask;
-import tasks.GetSensorUnicoTask;
-import tasks.LimpiezaAlarmasTask;
+import services.AlarmsNotifService;
 import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
@@ -57,12 +47,11 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     private ExpandableListView expList;
 
     private ActionMode mActionMode;
-    private SensorAmbiental sensorSelected;
-    private Parent grupoSelected;
+    private int groupPosition;
     private long packedPosition;
 
-    AlarmasService mService;
-    MyServiceConnection mConn;
+    //AlarmasService mService;
+    //MyServiceConnection mConn;
     boolean mIsBound;
 
     @Override
@@ -83,62 +72,72 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         mAdapter = new CustomExpandableListAdapter(parents, this);
         expList.setAdapter(mAdapter);
 
-        //Task actualiza lista de favoritos
-        new UpdateFavoritosTask(parents, this).execute();
-
         //Servicio de notificaciones de alarmas
-        Intent intent = new Intent(this, AlarmasService.class);
-        intent.putExtra("alarmas", listaAlarmas);
-        startService(intent);
+        //Intent intent = new Intent(this, AlarmasService.class);
+        //intent.putExtra("alarmas", listaAlarmas);
+        //startService(intent);
 
+        refreshScreen();
 
         /*expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    int childPosition = ExpandableListView.getPackedPositionChild(id);
-
-                    Log.d("Posicion (grupo): ", String.valueOf(groupPosition));
-                    Log.d("Posicion (child): ", String.valueOf(childPosition));
-
-                    Toast.makeText(getActivityContext(), "Posicion de la lista: "+childPosition, Toast.LENGTH_LONG).show();
-
-                    // You now have everything that you would as if this was an OnChildClickListener()
-                    // Add your logic here.
-
-                    // Return true as we are handling the event.
-                    return true;
-                }
-
-                return false;
+                //groupPosition = position;
+                actionModeEditar(position);
+                return true;
             }
         });*/
 
+        onStartService();
+
     }
 
-    class MyServiceConnection implements ServiceConnection {
-        private final String TAG = MyServiceConnection.class.getSimpleName();
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected()");
-            mService = ((AlarmasService.LocalBinder) service).getService();
-            mIsBound = true;
-
+    @Override
+    public void onStartService() {
+        Intent i = new Intent(getBaseContext(), AlarmsNotifService.class);
+        i.setAction(Intent.ACTION_VIEW);
+        i.putExtra("alarmas", listaAlarmas);
+        if(!(isMyServiceRunning(AlarmsNotifService.class))){
+            startService(i);
         }
+    }
 
+    private BroadcastReceiver testReceiver = new BroadcastReceiver() {
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected()");
-            mService = null;
-            mIsBound = false;
+        public void onReceive(Context context, Intent intent) {
+            ArrayList<Alarma> listaAlarmas;
+            int resultCode = intent.getIntExtra("resultCode", Activity.RESULT_OK);
+            if (resultCode == RESULT_OK) {
+                listaAlarmas = (ArrayList<Alarma>) intent.getSerializableExtra("alarmasResult");
+                //Toast.makeText(VistaFavoritos.this, String.valueOf(listaAlarmas.size()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(VistaFavoritos.this, String.valueOf(listaAlarmas.get(1).getAlarmasRegistradas().size()), Toast.LENGTH_SHORT).show();
+                updateListAlarmas(listaAlarmas);
+            }
         }
+    };
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public ExpandableListView getExpList() {
         return expList;
+    }
+
+    @Override
+    public void refreshScreen(){
+        //Task actualiza lista de favoritos
+        new UpdateFavoritosTask(parents, this).execute();
+        //updateListView(parents);
+        mAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -154,6 +153,8 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
         this.listaAlarmas = alarmas;
+        TinyDB tinydb = new TinyDB(this);
+        tinydb.putListAlarmas("alarmas", listaAlarmas);
     }
 
     @Override
@@ -176,44 +177,8 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     }
 
     @Override
-    public boolean checkItemList(int indexChild, int indexGroup){
-
-        //packedPosition = expList.getExpandableListPosition(position);
-        //int index = expList.getFlatListPosition(packedPosition);
-
-        //int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-        //int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
-
-        
-
-        // if group item clicked //
-        if (indexGroup == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            expList.setItemChecked(indexGroup, true);
-            grupoSelected = parents.get(indexGroup);
-            Log.d("Seleccion grupo: ", String.valueOf(indexGroup));
-            Log.d("Seleccion grupo: ", grupoSelected.getNombre());
-            actionModeEditar();
-            return true;
-        }
-
-        if (indexChild == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-
-            // handle data
-            expList.setItemChecked(indexChild, true);
-            sensorSelected = parents.get(indexGroup).getChild(indexChild);
-            Log.d("Seleccion child: ", String.valueOf(indexChild));
-            Log.d("Seleccion child: ", sensorSelected.getTitulo());
-            actionModeEditar();
-            // return true as we are handling the event.
-            return true;
-        }
-        return true;
-
-
-    }
-
-    @Override
-    public void actionModeEditar(){
+    public void actionModeEditar(int groupPosition){
+        this.groupPosition = groupPosition;
         mActionMode = startSupportActionMode(mActionModeCallback);
     }
 
@@ -242,6 +207,9 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         TinyDB tinydb = new TinyDB(this);
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
+
+        IntentFilter filter = new IntentFilter(AlarmsNotifService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(testReceiver, filter);
     }
 
     @Override
@@ -279,6 +247,7 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 
+        Parent grupoAction;
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -290,7 +259,8 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
+            grupoAction = parents.get(groupPosition);
+            return true;
         }
 
         @Override
@@ -305,19 +275,8 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
                     builderDelete.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                                    ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                                Log.d("Posicion (grupo): ", String.valueOf(packedPosition));
-                                parents.remove(grupoSelected);
-                                VariablesGlobales.nombreGrupos.remove(grupoSelected.getNombre());
-                            }
-                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                                    ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                                Log.d("Posicion (child): ", String.valueOf(packedPosition));
-                                for(Parent p : parents){
-                                    p.removeChild(sensorSelected);
-                                }
-                            }
+                            parents.remove(grupoAction);
+                            VariablesGlobales.nombreGrupos.remove(grupoAction.getNombre());
                             mAdapter.setData(parents);
                         }
                     });
@@ -328,31 +287,6 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
                         }
                     });
                     builderDelete.show();
-
-
-                    mode.finish();
-                    return true;
-                case R.id.share:
-                    if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                            ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                        Toast.makeText(getActivityContext(), "Selecciona un sensor para compartir", Toast.LENGTH_LONG).show();
-                    }else{
-                        Intent myIntent = new Intent(Intent.ACTION_SEND);
-                        myIntent.setType("text/plain");
-                        String shareBody = "";
-                        if(sensorSelected.getTipo().equals("WeatherObserved")){
-                            shareBody = sensorSelected.getTitulo() + "\n" + "Temp: " + sensorSelected.getTemperatura() +
-                                        "\n" + "https://maps.google.com/?q=" + sensorSelected.getLatitud() + "," + sensorSelected.getLongitud();
-                        }
-                        if(sensorSelected.getTipo().equals("NoiseLevelObserved")){
-                            shareBody = sensorSelected.getTitulo() + "\n" + "Noise: " + sensorSelected.getRuido() +
-                                        "\n" + "https://maps.google.com/?q=" + sensorSelected.getLatitud() + "," + sensorSelected.getLongitud();
-                        }
-                        String shareSub = "Your subject";
-                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                        startActivity(Intent.createChooser(myIntent, "Share using"));
-                    }
 
                     mode.finish();
                     return true;
@@ -371,20 +305,12 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String nombreNuevo = inputRename.getText().toString();
-                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                                    ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                                String nombreViejo = grupoSelected.getNombre();
+                            String nombreViejo = grupoAction.getNombre();
 
-                                int index = VariablesGlobales.nombreGrupos.indexOf(nombreViejo);
-                                VariablesGlobales.nombreGrupos.set(index, nombreNuevo);
+                            int index = VariablesGlobales.nombreGrupos.indexOf(nombreViejo);
+                            VariablesGlobales.nombreGrupos.set(index, nombreNuevo);
+                            grupoAction.setNombre(nombreNuevo);
 
-                                grupoSelected.setNombre(nombreNuevo);
-
-                            }
-                            if (ExpandableListView.getPackedPositionType(packedPosition) ==
-                                    ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                                sensorSelected.setTitulo(nombreNuevo);
-                            }
                             mAdapter.setData(parents);
                         }
                     });

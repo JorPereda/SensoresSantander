@@ -181,10 +181,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_add_alarm"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/spacer" />
+                    app:layout_constraintTop_toBottomOf="@+id/spacer"
+                    app:layout_constraintEnd_toStartOf="@+id/boton_rename_fav"/>
+
+                <ImageButton
+                    android:id="@+id/boton_rename_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_baseline_edit_24"
+                    app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintEnd_toStartOf="@+id/boton_share_fav"/>
+
+                <ImageButton
+                    android:id="@+id/boton_share_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_share"
+                    app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_rename_fav"
+                    app:layout_constraintEnd_toStartOf="@+id/boton_eliminar_fav"/>
 
                 <ImageButton
                     android:id="@+id/boton_eliminar_fav"
@@ -192,8 +209,8 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_delete"
                     app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
-                    app:layout_constraintStart_toEndOf="@+id/boton_nueva_alarma"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/boton_share_fav"
+                    app:layout_constraintEnd_toEndOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

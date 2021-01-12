@@ -49,17 +49,6 @@ public class PresenterVistaMapa implements Interfaces_MVP.PresenterMapa {
         TipoMapa tipo = new TipoMapa(sensorAmbList);
 
         switch (item.getItemId()) {
-            /*case R.id.action_refresh:
-                Toast.makeText(mView.getActivityContext(), "Refresh selected", Toast.LENGTH_SHORT).show();
-                tipo.mapaCompleto(map);
-                try {
-                    new GetDataTotalTask(mView.).execute().get();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return true;*/
             case R.id.filtro_fecha:
                 //long fechaSeleccionada =
                 mView.dialogFiltrarFechas();

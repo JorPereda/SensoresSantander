@@ -82,10 +82,7 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
 
         switch (item.getItemId()) {
             case R.id.action_refresh_list:
-                new UpdateFavoritosTask(parents, mView).execute();
-                mView.updateListView(parents);
-                Log.d("MenuFav1 parents: ", parents.toString());
-
+                mView.refreshScreen();
                 return true;
 
             case R.id.irMapa:

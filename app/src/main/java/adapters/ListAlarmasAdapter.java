@@ -1,30 +1,26 @@
 package adapters;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
-import android.content.Context;
-import android.content.Intent;
+
+import android.os.Build;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.RequiresApi;
 
 import com.example.sensorsantander.R;
-import com.example.sensorsantander.VistaAlarmas;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.function.Predicate;
 
 import datos.Alarma;
 import datos.AlarmaRegistrada;
@@ -33,18 +29,15 @@ import utilities.Interfaces_MVP;
 
 public class ListAlarmasAdapter extends BaseAdapter {
 
-    private ArrayList<Alarma> listaAlarmas;
+    private final ArrayList<Alarma> listaAlarmas;
     private ArrayList<AlarmaRegistrada> alarmasRegistradas;
-    private LayoutInflater inflater;
-    private Interfaces_MVP.ViewFavoritosYAlarma mView;
+    private final LayoutInflater inflater;
+    private final Interfaces_MVP.ViewFavoritosYAlarma mView;
 
-    private String nombreAlarmaNotificacion;
-
-    public ListAlarmasAdapter(ArrayList<Alarma> listaAlarmas, String nombreAlarmaNotificacion, Interfaces_MVP.ViewFavoritosYAlarma view){
+    public ListAlarmasAdapter(ArrayList<Alarma> listaAlarmas, Interfaces_MVP.ViewFavoritosYAlarma view){
         inflater = LayoutInflater.from(view.getActivityContext());
         this.listaAlarmas = listaAlarmas;
         mView = view;
-        this.nombreAlarmaNotificacion = nombreAlarmaNotificacion;
     }
 
     @Override
@@ -62,6 +55,7 @@ public class ListAlarmasAdapter extends BaseAdapter {
         return position;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
@@ -109,6 +103,7 @@ public class ListAlarmasAdapter extends BaseAdapter {
                 listaAlarmas.remove(alarma);
                 notifyDataSetChanged();
                 mView.updateListAlarmas(listaAlarmas);
+                mView.onStartService();
             }
         });
 
@@ -122,31 +117,70 @@ public class ListAlarmasAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (hiddenView.getVisibility() == View.VISIBLE) {
-                    cardViewManage.collapse(hiddenView);
+                    CardViewManage.collapse(hiddenView);
                 }else if(hiddenView.getVisibility() == View.GONE){
-                    cardViewManage.expand(hiddenView);
+                    CardViewManage.expand(hiddenView);
                 }
             }
         });
 
+        //Todas las alarmas registradas del sensor
         alarmasRegistradas = alarma.getAlarmasRegistradas();
+        Log.e("Limpieza ", "Alarmas reg: " + alarmasRegistradas.size());
+
+        //Borramos las de 2 dias antes
+        alarmasRegistradas.removeAll(listarAlarmasRegistradas(alarmasRegistradas));
+        Log.e("Limpieza ", "Alarmas borrar: " + listarAlarmasRegistradas(alarmasRegistradas).size());
+
+        Log.e("Limpieza ", "Alarmas reg despues: " + alarmasRegistradas.size());
+
+        //alarmasRegistradas = listarAlarmasRegistradas(alarmasRegistradas);
+
+        //Listar cada alarma registrada
+        hiddenView.removeAllViews();
         for(AlarmaRegistrada al : alarmasRegistradas){
-            View line = hiddenView.inflate(mView.getActivityContext(), R.layout.lista_alarmas_activadas, null);
+            Log.e("Limpieza ", "Alarmas reg datos: " + al.getFechaReal() + " -->  <b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha());
+
+            View line = View.inflate(mView.getActivityContext(), R.layout.lista_alarmas_activadas, null);
             TextView tvName = line.findViewById(R.id.alarma_activada_nombre);
-            //TextView tvFecha = line.findViewById(R.id.alarma_activada_fecha);
             String textAlarma = "<b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha();
             tvName.setText(Html.fromHtml(textAlarma));
-            //tvFecha.setText(al.getFecha());
             tvName.setPaddingRelative(32,0,0,0);
-            //tvFecha.setPaddingRelative(0,0,0,0);
             hiddenView.addView(line);
         }
 
-        /*if (nombreAlarmaNotificacion.equals(alarma.getNombre())){
-            hiddenView.setVisibility(View.VISIBLE);
-        }*/
-
 
         return convertView;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private ArrayList<AlarmaRegistrada> listarAlarmasRegistradas(ArrayList<AlarmaRegistrada> alarmasRegistradas){
+
+        ArrayList<AlarmaRegistrada> alarmasRegBorradas = new ArrayList<>();
+
+
+        LocalDate fechaActual = LocalDate.now();
+        fechaActual = fechaActual.minusDays(1);
+
+        //Log.e("Limpieza ", "fecha: " + LocalDate.now());
+
+        for (Iterator<AlarmaRegistrada> iterator = alarmasRegistradas.iterator(); iterator.hasNext();) {
+            AlarmaRegistrada al = iterator.next();
+            //Log.e("Limpieza ", "fecha alarma: " + al.getFechaReal());
+
+            LocalDate fechaSensor = LocalDate.parse(al.getFechaReal());
+
+            //Log.e("Limpieza ", "fecha LocalDate: " + fechaSensor);
+
+            if(fechaSensor.isBefore(fechaActual)){
+                iterator.remove();
+                alarmasRegBorradas.add(al);
+            }
+            //Log.e("Limpieza ", "fecha alarma: " + al.getFechaReal());
+            //Log.e("Limpieza ", "fecha actual -2: " + fechaActual);
+
+        }
+
+        return alarmasRegBorradas;
     }
 }

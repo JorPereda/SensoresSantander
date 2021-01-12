@@ -141,14 +141,24 @@ public class CompruebaAlarmaTask extends AsyncTask<Void, Void, Boolean> {
 
         if (saltaAlarma){
 
-            int dia = LocalDateTime.now().getDayOfMonth();
-            int mes = LocalDateTime.now().getMonthValue();
-            int hora = LocalDateTime.now().getHour();
-            int minuto = LocalDateTime.now().getMinute();
+            String dia = String.valueOf(LocalDateTime.now().getDayOfMonth());
+            String mes = String.valueOf(LocalDateTime.now().getMonthValue());
+            String year = String.valueOf(LocalDateTime.now().getYear());
+            String hora = String.valueOf(LocalDateTime.now().getHour());
+            String minuto = String.valueOf(LocalDateTime.now().getMinute());
 
             String fecha;
 
-            if(dia<10){
+            if(Integer.parseInt(dia)<10){
+                dia = "0" + dia;
+            }
+            if(Integer.parseInt(mes)<10){
+                mes = "0" + mes;
+            }
+            if(Integer.parseInt(minuto)<10){
+                minuto = "0" + minuto;
+            }
+            /*if(dia<10){
                 if(minuto<10){
                     fecha = "0" + dia + "/" + mes + " " + hora + ":" + "0" + minuto;
                 }else{
@@ -160,10 +170,13 @@ public class CompruebaAlarmaTask extends AsyncTask<Void, Void, Boolean> {
                 }else{
                     fecha = dia + "/" + mes + " " + hora + ":" + minuto;
                 }
-            }
+            }*/
+            fecha = dia + "/" + mes + "/" + year + " " + hora + ":" + minuto;
 
             Log.e("Alarma saltada!!", "Ha saltado la alarma del sensor " + alarma.getNombre() + " con valor " + alarma.getMaxMin() + " = " + valorSensor);
-            Log.e("Alarma saltada(Datos). ", "Hora de la alarma: " + fecha + " con nombre " + alarma.getNombre());
+            Log.e("Alarma saltada(Aqui). ", "Hora de la alarma: " + fecha + " con nombre " + alarma.getNombre());
+            Log.e("Alarma saltada(Datos). ", "Fecha: " + fecha);
+
 
             AlarmaRegistrada alarmaRegistrada = new AlarmaRegistrada(valorSensor, fecha);
 

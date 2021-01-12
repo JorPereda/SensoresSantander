@@ -40,6 +40,7 @@ public interface Interfaces_MVP {
      */
     interface PresenterAlarma {
 
+        boolean menuAlarmas(MenuItem item);
     }
 
     /**
@@ -50,9 +51,13 @@ public interface Interfaces_MVP {
         Context getActivityContext();
         void addToGroup(Parent grupo);
         PresenterVistaFavoritos getPresenter();
-        boolean checkItemList(int indexChild, int indexGroup);
-        void actionModeEditar();
+
+        void actionModeEditar(int groupPosition);
         ExpandableListView getExpList();
+
+        void onStartService();
+        void refreshScreen();
+
         void updateParentInList(Parent parent);
         void updateListParents(ArrayList<Parent> parents);
         void updateListAlarmas(ArrayList<Alarma> alarmas);

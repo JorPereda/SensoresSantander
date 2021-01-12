@@ -1,11 +1,13 @@
 package datos;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDate;
 
-public class AlarmaRegistrada {
+public class AlarmaRegistrada implements Serializable {
 
     private Double valor;
     private String fecha;
+    private String fechaReal;
 
     public AlarmaRegistrada(Double valor, String fecha) {
         this.valor = valor;
@@ -26,5 +28,13 @@ public class AlarmaRegistrada {
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
+    }
+
+    public String getFechaReal() {
+        return fechaReal;
+    }
+
+    public void setFechaReal(String fechaReal) {
+        this.fechaReal = fechaReal;
     }
 }

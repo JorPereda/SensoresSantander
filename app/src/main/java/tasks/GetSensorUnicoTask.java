@@ -100,8 +100,8 @@ public class GetSensorUnicoTask extends AsyncTask<Void, Void, SensorAmbiental> {
                 a.setSensor(sensor);
             }
         }
-        //listaAlarmas.get(alarma.getIdAlarma()).setSensor(sensor);
         mView.updateListAlarmas(listaAlarmas);
+        //listaAlarmas.get(alarma.getIdAlarma()).setSensor(sensor);
 
     }
 }
