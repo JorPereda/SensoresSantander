@@ -72,22 +72,7 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         mAdapter = new CustomExpandableListAdapter(parents, this);
         expList.setAdapter(mAdapter);
 
-        //Servicio de notificaciones de alarmas
-        //Intent intent = new Intent(this, AlarmasService.class);
-        //intent.putExtra("alarmas", listaAlarmas);
-        //startService(intent);
-
         refreshScreen();
-
-        /*expList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //groupPosition = position;
-                actionModeEditar(position);
-                return true;
-            }
-        });*/
-
         onStartService();
 
     }

@@ -113,7 +113,7 @@ public class AlarmsNotifService extends IntentService {
         String maxMin = alarma.getMaxMin();
         Double valorAlarma = alarma.getValorAlarma();
         Double valorSensor = 0.0;
-        Boolean saltaAlarma = false;
+        Boolean saltaAlarma = alarma.getSaltaAlarma();
         ArrayList<AlarmaRegistrada> alarmasRegistradas = new ArrayList<>();
         alarmasRegistradas = alarma.getAlarmasRegistradas();
 
@@ -186,9 +186,9 @@ public class AlarmsNotifService extends IntentService {
 
         if (saltaAlarma){
 
+            alarma.setSaltaAlarma(false);
             int dia = LocalDateTime.now().getDayOfMonth();
             int mes = LocalDateTime.now().getMonthValue();
-            //int year = LocalDateTime.now().getYear();
             int hora = LocalDateTime.now().getHour();
             int minuto = LocalDateTime.now().getMinute();
 
@@ -266,6 +266,7 @@ public class AlarmsNotifService extends IntentService {
 
 
         }
+        saltaAlarma = false;
 
     }
 

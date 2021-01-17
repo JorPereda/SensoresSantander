@@ -11,6 +11,7 @@ public class Alarma implements Serializable {
     private String maxMin;
     private Double valorAlarma;
     private String nombre;
+    private Boolean saltaAlarma;
 
     private ArrayList<AlarmaRegistrada> alarmasRegistradas;
 
@@ -23,6 +24,7 @@ public class Alarma implements Serializable {
         this.maxMin = maxMin;
         this.valorAlarma = valorAlarma;
         this.nombre = nombre;
+        this.saltaAlarma = false;
         this.idAlarma = count.incrementAndGet();
         this.alarmasRegistradas = new ArrayList<>();
     }
@@ -77,5 +79,13 @@ public class Alarma implements Serializable {
 
     public void setAlarmasRegistradas(ArrayList<AlarmaRegistrada> alarmasRegistradas) {
         this.alarmasRegistradas = alarmasRegistradas;
+    }
+
+    public Boolean getSaltaAlarma() {
+        return saltaAlarma;
+    }
+
+    public void setSaltaAlarma(Boolean saltaAlarma) {
+        this.saltaAlarma = saltaAlarma;
     }
 }
