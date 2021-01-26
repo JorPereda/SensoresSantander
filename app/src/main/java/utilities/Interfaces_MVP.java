@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import java.util.ArrayList;
 
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import presenters.PresenterVistaFavoritos;
@@ -61,6 +62,9 @@ public interface Interfaces_MVP {
         void updateParentInList(Parent parent);
         void updateListParents(ArrayList<Parent> parents);
         void updateListAlarmas(ArrayList<Alarma> alarmas);
+
+        void updateListAlarmasRegistradas(Alarma alarma, ArrayList<AlarmaRegistrada> alarmasRegistradas);
+
         void updateAlarmInList(Alarma alarma);
         void updateListTotal(ArrayList<SensorAmbiental> sensorAmbList);
         void updateListView(ArrayList<Parent> parents);

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import presenters.PresenterVistaAlarmas;
@@ -136,6 +137,11 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
     @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
         this.listaAlarmas = alarmas;
+    }
+
+    @Override
+    public void updateListAlarmasRegistradas(Alarma alarma, ArrayList<AlarmaRegistrada> alarmasRegistradas) {
+
     }
 
     @Override

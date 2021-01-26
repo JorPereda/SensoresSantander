@@ -134,12 +134,12 @@ public class ListAlarmasAdapter extends BaseAdapter {
 
         Log.e("Limpieza ", "Alarmas reg despues: " + alarmasRegistradas.size());
 
-        //alarmasRegistradas = listarAlarmasRegistradas(alarmasRegistradas);
+        mView.updateListAlarmasRegistradas(alarma, alarmasRegistradas);
 
         //Listar cada alarma registrada
         hiddenView.removeAllViews();
         for(AlarmaRegistrada al : alarmasRegistradas){
-            Log.e("Limpieza ", "Alarmas reg datos: " + al.getFechaReal() + " -->  <b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha());
+            //Log.e("Limpieza ", "Alarmas reg datos: " + al.getFechaReal() + " -->  <b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha());
 
             View line = View.inflate(mView.getActivityContext(), R.layout.lista_alarmas_activadas, null);
             TextView tvName = line.findViewById(R.id.alarma_activada_nombre);
@@ -148,7 +148,6 @@ public class ListAlarmasAdapter extends BaseAdapter {
             tvName.setPaddingRelative(32,0,0,0);
             hiddenView.addView(line);
         }
-
 
         return convertView;
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.sensorsantander">
 
     <!-- MAP PERMISSION -->
@@ -9,6 +10,8 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
 
     <permission
         android:name="com.example.sensorsantander.permission.MAPS_RECEIVE"
@@ -87,6 +90,20 @@
         <service android:name="services.AlarmsNotifService"
             android:exported="false"
             android:icon="@mipmap/sensoricon"/>
+
+        <receiver
+            android:name="services.Restarter"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="restartservice" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="services.AlarmasKeepRunningService"
+            android:enabled="true" >
+        </service>
 
     </application>
 

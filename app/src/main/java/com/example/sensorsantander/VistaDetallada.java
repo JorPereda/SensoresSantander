@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
@@ -186,6 +187,11 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
+
+    }
+
+    @Override
+    public void updateListAlarmasRegistradas(Alarma alarma, ArrayList<AlarmaRegistrada> alarmasRegistradas) {
 
     }
 

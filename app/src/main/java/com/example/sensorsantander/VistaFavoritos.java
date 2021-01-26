@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,12 +25,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.util.ArrayList;
 
 import datos.Alarma;
+import datos.AlarmaRegistrada;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
 import adapters.CustomExpandableListAdapter;
+import services.AlarmasKeepRunningService;
 import services.AlarmsNotifService;
+import services.Restarter;
 import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
@@ -54,6 +58,11 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     //MyServiceConnection mConn;
     boolean mIsBound;
 
+    Intent mServiceIntent;
+    private AlarmasKeepRunningService mYourService;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_AppCompat_Light);
@@ -73,8 +82,38 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         expList.setAdapter(mAdapter);
 
         refreshScreen();
-        onStartService();
+        //onStartService();
 
+        mYourService = new AlarmasKeepRunningService();
+        mServiceIntent = new Intent(this, mYourService.getClass());
+        if (!isMyServiceRunning(mYourService.getClass())) {
+            mServiceIntent.setAction(Intent.ACTION_VIEW);
+            mServiceIntent.putExtra("alarmas", listaAlarmas);
+            startService(mServiceIntent);
+        }
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("Service status", "Running");
+                return true;
+            }
+        }
+        Log.i ("Service status", "Not running");
+        return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        //stopService(mServiceIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("restartservice");
+        broadcastIntent.setClass(this, Restarter.class);
+        this.sendBroadcast(broadcastIntent);
+        super.onDestroy();
     }
 
     @Override
@@ -100,16 +139,6 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
             }
         }
     };
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     public ExpandableListView getExpList() {
@@ -138,8 +167,21 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     @Override
     public void updateListAlarmas(ArrayList<Alarma> alarmas) {
         this.listaAlarmas = alarmas;
-        TinyDB tinydb = new TinyDB(this);
-        tinydb.putListAlarmas("alarmas", listaAlarmas);
+        //TinyDB tinydb = new TinyDB(this);
+        //tinydb.putListAlarmas("alarmas", listaAlarmas);
+    }
+
+    @Override
+    public void updateListAlarmasRegistradas(Alarma alarma, ArrayList<AlarmaRegistrada> alarmasRegistradas) {
+        for(Alarma al : listaAlarmas){
+            if(al.equals(alarma)){
+                al.setAlarmasRegistradas(alarmasRegistradas);
+                updateAlarmInList(al);
+            }
+        }
+
+        //TinyDB tinydb = new TinyDB(this);
+        //tinydb.putListAlarmas("alarmas", listaAlarmas);
     }
 
     @Override
@@ -192,6 +234,8 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         TinyDB tinydb = new TinyDB(this);
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
+
+        tinydb.putListAlarmas("alarmas", listaAlarmas);
 
         IntentFilter filter = new IntentFilter(AlarmsNotifService.ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(testReceiver, filter);
