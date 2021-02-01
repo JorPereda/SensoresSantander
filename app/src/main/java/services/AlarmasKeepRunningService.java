@@ -155,9 +155,13 @@ public class AlarmasKeepRunningService extends Service {
             String maxMin = alarma.getMaxMin();
             Double valorAlarma = alarma.getValorAlarma();
             Double valorSensor = 0.0;
-            Boolean saltaAlarma = alarma.getSaltaAlarma();
+            Boolean estadoAlarma = alarma.getSaltaAlarma();
+            Boolean saltaAlarma = false;
             ArrayList<AlarmaRegistrada> alarmasRegistradas = new ArrayList<>();
             alarmasRegistradas = alarma.getAlarmasRegistradas();
+
+
+            Log.i("Alarma Service", "Estado de alarma 1: " + saltaAlarma.toString());
 
 
             //Comprobacion de la alarma registrada
@@ -224,94 +228,89 @@ public class AlarmasKeepRunningService extends Service {
                 }
             }
 
+            Log.i("Alarma Service", "Estado de alarma 2: " + saltaAlarma.toString());
+
+
             //Si la comprobacion resulta true, genera notificacion
-
-            if (saltaAlarma){
-
-                alarma.setSaltaAlarma(false);
-                int dia = LocalDateTime.now().getDayOfMonth();
-                int mes = LocalDateTime.now().getMonthValue();
-                int hora = LocalDateTime.now().getHour();
-                int minuto = LocalDateTime.now().getMinute();
-
-                String fecha;
-
-                //Cambios debido a que los numeros menores de 10 salen con una unica cifra
-                if(dia<10){
-                    if(minuto<10){
-                        fecha = "0" + dia + "/" + mes + " " + hora + ":" + "0" + minuto;
-                    }else{
-                        fecha = "0" + dia + "/" + mes + " " + hora + ":" + minuto;
-                    }
-                }else{
-                    if(minuto<10){
-                        fecha = dia + "/" + mes + " " + hora + ":" + "0" + minuto;
-                    }else{
-                        fecha = dia + "/" + mes + " " + hora + ":" + minuto;
-                    }
+            if(estadoAlarma){
+                if (saltaAlarma==false){
+                    alarma.setSaltaAlarma(false);
                 }
-
-                //Log.e("Alarma saltada!!", "Ha saltado la alarma del sensor " + alarma.getNombre() + " con valor " + alarma.getMaxMin() + " = " + valorSensor);
-                //Log.e("Alarma saltada(Datos). ", "Hora de la alarma: " + fecha + " con nombre " + alarma.getNombre());
-
-                AlarmaRegistrada alarmaRegistrada = new AlarmaRegistrada(valorSensor, fecha);
-
-                //Añadimos aparte la fecha completa en formato por defecto para comprobaciones
-                LocalDate fechalocal;
-                fechalocal = LocalDate.now();
-                Log.e("Fecha. ", "LocalDate.now: " + fechalocal);
-                alarmaRegistrada.setFechaReal(fechalocal.toString());
-                Log.e("Fecha. ", "Alarma.getFechaReal: " + alarmaRegistrada.getFechaReal());
-
-                alarmasRegistradas.add(alarmaRegistrada);
-                alarma.setAlarmasRegistradas(alarmasRegistradas);
-
-                TinyDB tinydb = new TinyDB(this);
-                tinydb.putListAlarmas("alarmas", listaAlarmas);
-
-                Log.e("Alarmas regs: ", String.valueOf(listaAlarmas.get(0).getAlarmasRegistradas().size()));
-
-                // Create the NotificationChannel, but only on API 26+ because
-                // the NotificationChannel class is new and not in the support library
-                String CHANNEL_ID = String.valueOf(alarma.getIdAlarma());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    CharSequence name = "Nombre del canal";
-                    String description = "Descripcion";
-                    int importance = NotificationManager.IMPORTANCE_DEFAULT;
-                    NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-                    channel.setDescription(description);
-                    // Register the channel with the system; you can't change the importance
-                    // or other notification behaviors after this
-                    NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-                    notificationManager.createNotificationChannel(channel);
-                }
-
-
-                Intent i = new Intent(context, VistaAlarmas.class);
-                //i.putExtra("nombre", alarma.getNombre());
-                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, 0);
-
-                //Crear notificacion
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setContentIntent(pendingIntent)
-                        .setSmallIcon(R.mipmap.sensoricon)
-                        .setGroup("Alarmas de sensor")
-                        .setContentTitle(alarma.getNombre())
-                        .setAutoCancel(true)
-                        //.setContentText("La alarma " + alarma.getNombre() + " ha sido activada con un valor de: " + valorSensor + ".")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText("La alarma " + alarma.getNombre() + " ha sido activada con un valor de: " + valorSensor + "."))
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-                notificationManager.notify(alarma.getIdAlarma(), builder.build());
-
-
             }
-            saltaAlarma = false;
+
+            if (estadoAlarma==false){
+                if (saltaAlarma){
+                    alarma.setSaltaAlarma(true);
+                    int dia = LocalDateTime.now().getDayOfMonth();
+                    int mes = LocalDateTime.now().getMonthValue();
+                    int hora = LocalDateTime.now().getHour();
+                    int minuto = LocalDateTime.now().getMinute();
+
+                    String fecha;
+
+                    //Cambios debido a que los numeros menores de 10 salen con una unica cifra
+                    if(dia<10){
+                        if(minuto<10){
+                            fecha = "0" + dia + "/" + mes + " " + hora + ":" + "0" + minuto;
+                        }else{
+                            fecha = "0" + dia + "/" + mes + " " + hora + ":" + minuto;
+                        }
+                    }else{
+                        if(minuto<10){
+                            fecha = dia + "/" + mes + " " + hora + ":" + "0" + minuto;
+                        }else{
+                            fecha = dia + "/" + mes + " " + hora + ":" + minuto;
+                        }
+                    }
+
+                    AlarmaRegistrada alarmaRegistrada = new AlarmaRegistrada(valorSensor, fecha);
+
+                    //Añadimos aparte la fecha completa en formato por defecto para comprobaciones
+                    LocalDate fechalocal;
+                    fechalocal = LocalDate.now();
+                    alarmaRegistrada.setFechaReal(fechalocal.toString());
+
+                    alarmasRegistradas.add(alarmaRegistrada);
+                    alarma.setAlarmasRegistradas(alarmasRegistradas);
+
+                    TinyDB tinydb = new TinyDB(this);
+                    tinydb.putListAlarmas("alarmas", listaAlarmas);
+
+                    // Create the NotificationChannel, but only on API 26+ because
+                    // the NotificationChannel class is new and not in the support library
+                    String CHANNEL_ID = String.valueOf(alarma.getIdAlarma());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        CharSequence name = "Nombre del canal";
+                        String description = "Descripcion";
+                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                        channel.setDescription(description);
+                        // Register the channel with the system; you can't change the importance
+                        // or other notification behaviors after this
+                        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+                        notificationManager.createNotificationChannel(channel);
+                    }
+
+
+                    Intent i = new Intent(context, VistaAlarmas.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, 0);
+
+                    //Crear notificacion
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                            .setContentIntent(pendingIntent)
+                            .setSmallIcon(R.mipmap.sensoricon)
+                            .setGroup("Alarmas de sensor")
+                            .setContentTitle(alarma.getNombre())
+                            .setAutoCancel(true)
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText("La alarma " + alarma.getNombre() + " ha sido activada con un valor de: " + valorSensor + "."))
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                    notificationManager.notify(alarma.getIdAlarma(), builder.build());
+                }
+            }
         }
-
-
     }
 
     private Alarma updateSensor(Alarma alarma){

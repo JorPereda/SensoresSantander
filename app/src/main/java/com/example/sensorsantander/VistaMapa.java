@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import datos.SensorAmbiental;
@@ -44,7 +47,7 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
 
     private GoogleMap map;
 
-    private long selectedDate;
+    private LocalDate selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,18 +155,31 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
         final AlertDialog dialog = builder.create();
         dialog.show();
 
-        Button botonAceptar = customLayout.findViewById(R.id.button_ok_filtro_fecha);
+        final Button botonAceptar = customLayout.findViewById(R.id.button_ok_filtro_fecha);
 
         final TipoMapa tipo = new TipoMapa(sensorAmbList);
 
+        simpleCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+                String date = String.valueOf(year) +"-"+ String.valueOf(month+1) +"-"+ String.valueOf(dayOfMonth);
+                LocalDate fechaSeleccionada = LocalDate.parse(date, formatter);
+                //fechaDelCalendario = fechaSeleccionada.toEpochDay();
+                setSelectedDate(fechaSeleccionada);
+            }
+        });
 
         botonAceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //fechaDelCalendario = simpleCalendarView.getDate();
-                setSelectedDate(simpleCalendarView.getDate()); // get selected date in milliseconds
-                Log.d(TAG, "Date Year calendario: "+ getSelectedDate());
+                //setSelectedDate(simpleCalendarView.getDate()); // get selected date in milliseconds
+                //Log.d(TAG, "Date Year calendario: "+ getSelectedDate());
                 tipo.mapaFiltroFecha(map, getSelectedDate());
+                //LocalDate fechaSeleccionada = Instant.ofEpochMilli(simpleCalendarView.getDate()).atZone(TimeZone.getDefault().toZoneId()).toLocalDate();
+                Log.d(TAG, "Date Fecha calendario: "+ getSelectedDate());
                 //setSelectedDate(selectedDate);
                 dialog.dismiss();
             }
@@ -175,11 +191,11 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
 
     }
 
-    public long getSelectedDate() {
+    public LocalDate getSelectedDate() {
         return selectedDate;
     }
 
-    public void setSelectedDate(long selectedDate) {
+    public void setSelectedDate(LocalDate selectedDate) {
         this.selectedDate = selectedDate;
     }
 

@@ -131,7 +131,6 @@ public class ListAlarmasAdapter extends BaseAdapter {
         //Borramos las de 2 dias antes
         alarmasRegistradas.removeAll(listarAlarmasRegistradas(alarmasRegistradas));
         Log.e("Limpieza ", "Alarmas borrar: " + listarAlarmasRegistradas(alarmasRegistradas).size());
-
         Log.e("Limpieza ", "Alarmas reg despues: " + alarmasRegistradas.size());
 
         mView.updateListAlarmasRegistradas(alarma, alarmasRegistradas);
@@ -139,8 +138,6 @@ public class ListAlarmasAdapter extends BaseAdapter {
         //Listar cada alarma registrada
         hiddenView.removeAllViews();
         for(AlarmaRegistrada al : alarmasRegistradas){
-            //Log.e("Limpieza ", "Alarmas reg datos: " + al.getFechaReal() + " -->  <b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha());
-
             View line = View.inflate(mView.getActivityContext(), R.layout.lista_alarmas_activadas, null);
             TextView tvName = line.findViewById(R.id.alarma_activada_nombre);
             String textAlarma = "<b>Valor: </b>" + al.getValor().toString() + "  <b>Fecha:</b> " + al.getFecha();
@@ -157,29 +154,19 @@ public class ListAlarmasAdapter extends BaseAdapter {
 
         ArrayList<AlarmaRegistrada> alarmasRegBorradas = new ArrayList<>();
 
-
         LocalDate fechaActual = LocalDate.now();
         fechaActual = fechaActual.minusDays(1);
 
-        //Log.e("Limpieza ", "fecha: " + LocalDate.now());
-
         for (Iterator<AlarmaRegistrada> iterator = alarmasRegistradas.iterator(); iterator.hasNext();) {
             AlarmaRegistrada al = iterator.next();
-            //Log.e("Limpieza ", "fecha alarma: " + al.getFechaReal());
 
             LocalDate fechaSensor = LocalDate.parse(al.getFechaReal());
-
-            //Log.e("Limpieza ", "fecha LocalDate: " + fechaSensor);
 
             if(fechaSensor.isBefore(fechaActual)){
                 iterator.remove();
                 alarmasRegBorradas.add(al);
             }
-            //Log.e("Limpieza ", "fecha alarma: " + al.getFechaReal());
-            //Log.e("Limpieza ", "fecha actual -2: " + fechaActual);
-
         }
-
         return alarmasRegBorradas;
     }
 }
