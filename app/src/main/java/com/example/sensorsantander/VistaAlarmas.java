@@ -86,12 +86,12 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
 
     @Override
     public Context getAppContext() {
-        return this;
+        return getApplicationContext();
     }
 
     @Override
     public Context getActivityContext() {
-        return getApplicationContext();
+        return this;
     }
 
     @Override
@@ -114,10 +114,6 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
         return null;
     }
 
-    @Override
-    public void onStartService() {
-
-    }
 
     @Override
     public void refreshScreen() {

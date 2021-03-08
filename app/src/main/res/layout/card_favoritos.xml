@@ -112,7 +112,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:orientation="vertical"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -183,6 +183,24 @@
                     android:src="@drawable/ic_add_alarm"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/spacer"
+                    app:layout_constraintEnd_toStartOf="@+id/boton_stats"/>
+
+                <ImageButton
+                    android:id="@+id/boton_new_stats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_baseline_addchart_24"
+                    app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintEnd_toStartOf="@+id/boton_stats"/>
+
+                <ImageButton
+                    android:id="@+id/boton_stats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_stats"
+                    app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_new_stats"
                     app:layout_constraintEnd_toStartOf="@+id/boton_rename_fav"/>
 
                 <ImageButton
@@ -191,7 +209,7 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_baseline_edit_24"
                     app:layout_constraintTop_toTopOf="@+id/boton_nueva_alarma"
-                    app:layout_constraintStart_toEndOf="@+id/boton_nueva_alarma"
+                    app:layout_constraintStart_toEndOf="@+id/boton_stats"
                     app:layout_constraintEnd_toStartOf="@+id/boton_share_fav"/>
 
                 <ImageButton

@@ -165,10 +165,6 @@ public class VistaDetallada extends AppCompatActivity implements AdapterView.OnI
         return null;
     }
 
-    @Override
-    public void onStartService() {
-
-    }
 
     @Override
     public void refreshScreen() {

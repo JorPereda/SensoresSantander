@@ -26,15 +26,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.sensorsantander.R;
 import com.example.sensorsantander.VistaSensorUnicoMapa;
+import com.example.sensorsantander.VistaStats;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
+import services.EstadisticasService;
 import tasks.UpdateFavoritosTask;
 import utilities.CardViewManage;
 import utilities.Interfaces_MVP;
@@ -47,7 +51,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private LayoutInflater inflater;
     // View reference.
     private Interfaces_MVP.ViewFavoritosYAlarma mView;
-
 
 
     public CustomExpandableListAdapter(ArrayList<Parent> parents, Interfaces_MVP.ViewFavoritosYAlarma view) {
@@ -91,6 +94,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         ImageButton botonRename = convertView.findViewById(R.id.boton_rename_fav);
         ImageButton botonShare = convertView.findViewById(R.id.boton_share_fav);
         ImageButton botonEliminar = convertView.findViewById(R.id.boton_eliminar_fav);
+        ImageButton botonStats = convertView.findViewById(R.id.boton_stats);
+        ImageButton botonNewStats = convertView.findViewById(R.id.boton_new_stats);
 
         t1.setText(child.getTitulo());
         if(child.getTipo().equals("WeatherObserved")){
@@ -281,6 +286,60 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
             }
         });
 
+        botonStats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mView.getActivityContext(), VistaStats.class);
+                intent.putExtra("sensor", child);
+                mView.getActivityContext().startActivity(intent);
+                Log.d("Estadisticas Adapter", "SensorIntent: " + child.getIdentificador() + " " + child.getTitulo());
+            }
+        });
+
+        botonNewStats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String[] selectedItem = new String[1];
+                final AlertDialog.Builder builderGeneraStats = new AlertDialog.Builder(mView.getActivityContext());
+                builderGeneraStats.setTitle("Generar estadisticas");
+
+                final String[] items = {"Cada hora", "Cada día"};
+                builderGeneraStats.setSingleChoiceItems(
+                        items,
+                        -1, // Index of checked item (-1 = no selection)
+                        new DialogInterface.OnClickListener() // Item click listener
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                selectedItem[0] = Arrays.asList(items).get(i);
+
+                            }
+                        });
+
+                builderGeneraStats.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast toast1 = Toast.makeText(mView.getActivityContext(),selectedItem[0], Toast.LENGTH_LONG);
+                        toast1.show();
+                        int intervalo = 0;
+                        if(selectedItem[0].equals("Cada hora")){
+                            intervalo = 1;
+                        }else if (selectedItem[0].equals("Cada día")){
+                            intervalo = 2;
+                        }
+
+                        Intent intent = new Intent(mView.getActivityContext(), VistaStats.class);
+                        intent.putExtra("sensor", child);
+                        intent.putExtra("Intervalo", intervalo);
+                        mView.getActivityContext().startActivity(intent);
+                    }
+                });
+                AlertDialog dialog = builderGeneraStats.create();
+
+                dialog.show();
+            }
+
+        });
 
         return convertView;
     }

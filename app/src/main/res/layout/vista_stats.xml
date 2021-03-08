@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvStatsName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="SENSOR" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="TEMPERATURA" />
+    <TableRow>
+        <TextView
+            android:id="@+id/tvTempMediaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Media: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvTempMediaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor media" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvTempMedianaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mediana: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvTempMedianaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mediana" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvTempMaxLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor máximo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvTempMaxValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor maximo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvTempMinLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mínimo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvTempMinValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor minimo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvTempDesvLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvTempDesvValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar" />
+    </TableRow>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="RUIDO" />
+    <TableRow>
+        <TextView
+            android:id="@+id/tvRuidoMediaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Media: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvRuidoMediaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor media" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvRuidoMedianaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mediana: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvRuidoMedianaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mediana" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvRuidoMaxLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor máximo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvRuidoMaxValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor maximo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvRuidoMinLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mínimo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvRuidoMinValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor minimo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvRuidoDesvLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvRuidoDesvValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar" />
+    </TableRow>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="LUMINOSIDAD" />
+    <TableRow>
+        <TextView
+            android:id="@+id/tvLuzMediaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Media: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvLuzMediaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor media" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvLuzMedianaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mediana: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvLuzMedianaValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mediana" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvLuzMaxLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor máximo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvLuzMaxValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor maximo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvLuzMinLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor mínimo: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvLuzMinValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valor minimo" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/tvLuzDesvLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar: "
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvLuzDesvValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desviación estándar" />
+    </TableRow>
+
+
+</TableLayout>

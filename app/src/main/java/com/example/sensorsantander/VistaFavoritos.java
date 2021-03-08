@@ -12,8 +12,6 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 
@@ -33,7 +31,8 @@ import presenters.PresenterVistaFavoritos;
 import adapters.CustomExpandableListAdapter;
 import services.AlarmasKeepRunningService;
 import services.AlarmsNotifService;
-import services.Restarter;
+import services.EstadisticasService;
+import services.RestarterAlarmas;
 import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
@@ -58,8 +57,10 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
     //MyServiceConnection mConn;
     boolean mIsBound;
 
-    Intent mServiceIntent;
-    private AlarmasKeepRunningService mYourService;
+    Intent serviceAlarmasIntent;
+    Intent serviceStatsIntent;
+    private AlarmasKeepRunningService serviceAlarmas;
+    private EstadisticasService serviceStats;
 
 
 
@@ -82,20 +83,28 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         expList.setAdapter(mAdapter);
 
         refreshScreen();
-        //onStartService();
 
-        mYourService = new AlarmasKeepRunningService();
-        mServiceIntent = new Intent(this, mYourService.getClass());
-        if (!isMyServiceRunning(mYourService.getClass())) {
-            mServiceIntent.setAction(Intent.ACTION_VIEW);
-            mServiceIntent.putExtra("alarmas", listaAlarmas);
-            startService(mServiceIntent);
+        serviceAlarmas = new AlarmasKeepRunningService();
+        serviceAlarmasIntent = new Intent(this, serviceAlarmas.getClass());
+        if (!isMyServiceRunning(serviceAlarmas.getClass())) {
+            serviceAlarmasIntent.setAction(Intent.ACTION_VIEW);
+            serviceAlarmasIntent.putExtra("alarmas", listaAlarmas);
+            startService(serviceAlarmasIntent);
         }
+
+        /*serviceStats = new EstadisticasService();
+        serviceStatsIntent = new Intent(this, serviceStats.getClass());
+        if (!isMyServiceRunning(serviceStats.getClass())) {
+            serviceStatsIntent.setAction(Intent.ACTION_VIEW);
+            serviceStatsIntent.putExtra("parents", parents);
+            startService(serviceStatsIntent);
+        }*/
 
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        assert manager != null;
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 Log.i ("Service status", "Running");
@@ -106,17 +115,17 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         return false;
     }
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         //stopService(mServiceIntent);
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("restartservice");
-        broadcastIntent.setClass(this, Restarter.class);
+        broadcastIntent.setClass(this, RestarterAlarmas.class);
         this.sendBroadcast(broadcastIntent);
         super.onDestroy();
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onStartService() {
         Intent i = new Intent(getBaseContext(), AlarmsNotifService.class);
         i.setAction(Intent.ACTION_VIEW);
@@ -124,7 +133,7 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         if(!(isMyServiceRunning(AlarmsNotifService.class))){
             startService(i);
         }
-    }
+    }*/
 
     private BroadcastReceiver testReceiver = new BroadcastReceiver() {
         @Override

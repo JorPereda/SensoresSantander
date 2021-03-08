@@ -103,7 +103,6 @@ public class ListAlarmasAdapter extends BaseAdapter {
                 listaAlarmas.remove(alarma);
                 notifyDataSetChanged();
                 mView.updateListAlarmas(listaAlarmas);
-                mView.onStartService();
             }
         });
 

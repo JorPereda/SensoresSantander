@@ -45,8 +45,6 @@ import static services.AlarmsNotifService.ACTION;
 
 public class AlarmasKeepRunningService extends Service {
 
-    public int counter=0;
-
     public Context context;
     public ArrayList<Alarma> listaAlarmas;
 
@@ -58,14 +56,14 @@ public class AlarmasKeepRunningService extends Service {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
-            startForeground(1, new Notification());
+            startForeground(2077, new Notification());
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private void startMyOwnForeground()
     {
-        String NOTIFICATION_CHANNEL_ID = "example.permanence";
-        String channelName = "Background Service";
+        String NOTIFICATION_CHANNEL_ID = "sensores.alarmas";
+        String channelName = "Background Service Alarms";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -80,16 +78,16 @@ public class AlarmasKeepRunningService extends Service {
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-        startForeground(2, notification);
+        startForeground(2000, notification);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if(listaAlarmas==null){
+        //if(listaAlarmas==null){
             listaAlarmas = (ArrayList<Alarma>) intent.getSerializableExtra("alarmas");
-        }
+        //}
 
         startTimer();
         return START_STICKY;
@@ -102,7 +100,7 @@ public class AlarmasKeepRunningService extends Service {
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("restartservice");
-        broadcastIntent.setClass(this, Restarter.class);
+        broadcastIntent.setClass(this, RestarterAlarmas.class);
         this.sendBroadcast(broadcastIntent);
     }
 
@@ -116,20 +114,10 @@ public class AlarmasKeepRunningService extends Service {
         timer = new Timer();
         timerTask = new TimerTask() {
             public void run() {
-                //Log.i("Count", "=========  "+ (counter++));
-                //Log.i("Count alarm", "=========  "+ (listaAlarmas.get(0).getNombre()));
-
                 compruebaAlarma(listaAlarmas);
-                //Log.d("TAG alarma", "Mensaje de prueba en Task nueva de Service. " + al.getNombre());
-
             }
         };
         timer.schedule(timerTask, 1000, 300000); //5 minutos
-
-        //TinyDB tinydb = new TinyDB(this);
-        //tinydb.putListAlarmas("alarmas", listaAlarmas);
-
-        //Log.e("Alarma finservice", "Alarmas registradas " + listaAlarmas.get(0).getAlarmasRegistradas().size());
 
         Intent inResult = new Intent(ACTION);
         inResult.putExtra("resultCode", Activity.RESULT_OK);

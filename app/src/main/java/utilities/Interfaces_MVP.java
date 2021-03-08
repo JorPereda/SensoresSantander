@@ -44,6 +44,10 @@ public interface Interfaces_MVP {
         boolean menuAlarmas(MenuItem item);
     }
 
+    interface PresenterOthers {
+        boolean menu(MenuItem item);
+    }
+
     /**
      * Metodos View requeridos para el Presenter
      */
@@ -56,7 +60,7 @@ public interface Interfaces_MVP {
         void actionModeEditar(int groupPosition);
         ExpandableListView getExpList();
 
-        void onStartService();
+        //void onStartService();
         void refreshScreen();
 
         void updateParentInList(Parent parent);
@@ -72,6 +76,11 @@ public interface Interfaces_MVP {
 
     interface ViewMapa {
         void dialogFiltrarFechas();
+        Context getAppContext();
+        Context getActivityContext();
+    }
+
+    interface ViewOthers{
         Context getAppContext();
         Context getActivityContext();
     }
