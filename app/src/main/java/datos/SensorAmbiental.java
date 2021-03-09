@@ -18,6 +18,8 @@ public class SensorAmbiental implements Serializable {
     private String titulo;
     private String direccion;
 
+    private int intervaloStats;
+
     public SensorAmbiental(){
 
     }
@@ -35,6 +37,7 @@ public class SensorAmbiental implements Serializable {
         this.longitud = longitud;
         this.ultModificacion = ultModificacion;
         this.uri = uri;
+        this.intervaloStats = 0;
     }
 
     public String getIdentificador() {
@@ -131,5 +134,13 @@ public class SensorAmbiental implements Serializable {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public int getIntervaloStats() {
+        return intervaloStats;
+    }
+
+    public void setIntervaloStats(int intervaloStats) {
+        this.intervaloStats = intervaloStats;
     }
 }

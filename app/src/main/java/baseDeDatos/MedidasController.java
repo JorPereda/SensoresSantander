@@ -151,4 +151,19 @@ public class MedidasController {
         return luminosidades;
     }
 
+    public int guardarCambios(Medidas medidaEditada) {
+        SQLiteDatabase baseDeDatos = ayudanteBD.getWritableDatabase();
+        ContentValues valoresParaActualizar = new ContentValues();
+        valoresParaActualizar.put("fecha", medidaEditada.getFecha());
+        valoresParaActualizar.put("temp", medidaEditada.getTemperatura());
+        valoresParaActualizar.put("ruido", medidaEditada.getRuido());
+        valoresParaActualizar.put("luz", medidaEditada.getLuz());
+
+        // where id...
+        String campoParaActualizar = "id = ?";
+        // ... = idMascota
+        String[] argumentosParaActualizar = {String.valueOf(medidaEditada.getId())};
+        return baseDeDatos.update(NOMBRE_TABLA, valoresParaActualizar, campoParaActualizar, argumentosParaActualizar);
+    }
+
 }

@@ -8,11 +8,17 @@ import android.content.ContentValues;
 public class Medidas {
 
     private long id;
+
     private Integer idSensor;
     private String fecha;
     private String temp;
     private String ruido;
     private String luz;
+    //Intervalo 1 -> horas   2 -> dias
+    private int intervalo;
+
+    public Medidas(){
+    }
 
     public Medidas(Integer idSensor, String fecha, String temp, String ruido, String luz) {
         //this.id = id;
@@ -56,6 +62,22 @@ public class Medidas {
         return luz;
     }
 
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public void setTemp(String temp) {
+        this.temp = temp;
+    }
+
+    public void setRuido(String ruido) {
+        this.ruido = ruido;
+    }
+
+    public void setLuz(String luz) {
+        this.luz = luz;
+    }
+
     public ContentValues toContentValues() {
         ContentValues values = new ContentValues();
         values.put(EstadisticasContract.MedidasSensorEntry.ID, id);
@@ -67,4 +89,11 @@ public class Medidas {
         return values;
     }
 
+    public int getIntervalo() {
+        return intervalo;
+    }
+
+    public void setIntervalo(int intervalo) {
+        this.intervalo = intervalo;
+    }
 }

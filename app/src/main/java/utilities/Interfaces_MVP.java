@@ -23,6 +23,9 @@ public interface Interfaces_MVP {
     interface PresenterFavoritos {
         void showServerNotAvailable();
         void showConnectionNotAvailable();
+
+        void onClickAddRecogidaMedidas(SensorAmbiental sensor, int intervalo);
+
         void getListaSensores();
         boolean menuFavoritos(MenuItem item, Activity activity);
         void onClickAddFavorito(SensorAmbiental sensor, String grupo);

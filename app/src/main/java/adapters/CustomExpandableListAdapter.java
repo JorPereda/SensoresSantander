@@ -328,10 +328,13 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                             intervalo = 2;
                         }
 
-                        Intent intent = new Intent(mView.getActivityContext(), VistaStats.class);
+                        child.setIntervaloStats(intervalo);
+                        setData(parents);
+
+                        /*Intent intent = new Intent(mView.getActivityContext(), VistaStats.class);
                         intent.putExtra("sensor", child);
                         intent.putExtra("Intervalo", intervalo);
-                        mView.getActivityContext().startActivity(intent);
+                        mView.getActivityContext().startActivity(intent);*/
                     }
                 });
                 AlertDialog dialog = builderGeneraStats.create();

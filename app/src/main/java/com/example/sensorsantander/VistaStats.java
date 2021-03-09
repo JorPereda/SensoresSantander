@@ -62,7 +62,8 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
 
         Intent intent = getIntent();
         sensor = (SensorAmbiental) intent.getSerializableExtra("sensor");
-        intervalo = intent.getIntExtra("Intervalo",0);
+        assert sensor != null;
+        intervalo = sensor.getIntervaloStats();
         Log.d("VistaEstadisticas ", "SensorStats: " + sensor.getIdentificador() + " " + sensor.getTitulo());
 
 
@@ -113,23 +114,22 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
         tvSensor.setText(sensor.getTitulo());
 
         tvTempMedia.setText(String.valueOf(tempStats.getMean()));
-        //tvTempMediana.setText(String.valueOf(mediana.evaluate(tempMedianas)));
+        tvTempMediana.setText(String.valueOf(mediana.evaluate(tempStats.getValues())));
         tvTempMax.setText(String.valueOf(tempStats.getMax()));
         tvTempMin.setText(String.valueOf(tempStats.getMin()));
         tvTempDesv.setText(String.valueOf(tempStats.getStandardDeviation()));
 
         tvRuidoMedia.setText(String.valueOf(ruidoStats.getMean()));
-        //tvRuidoMediana.setText(String.valueOf(calculaMediana(ruidos)));
+        tvRuidoMediana.setText(String.valueOf(mediana.evaluate(ruidoStats.getValues())));
         tvRuidoMax.setText(String.valueOf(ruidoStats.getMax()));
         tvRuidoMin.setText(String.valueOf(ruidoStats.getMin()));
         tvRuidoDesv.setText(String.valueOf(ruidoStats.getStandardDeviation()));
 
         tvLuzMedia.setText(String.valueOf(luzStats.getMean()));
-        //tvLuzMediana.setText(String.valueOf(calculaMediana(luminosidades)));
+        tvLuzMediana.setText(String.valueOf(mediana.evaluate(luzStats.getValues())));
         tvLuzMax.setText(String.valueOf(luzStats.getMax()));
         tvLuzMin.setText(String.valueOf(luzStats.getMin()));
         tvLuzDesv.setText(String.valueOf(luzStats.getStandardDeviation()));
-
 
         Log.d("VistaStats ", "Medidas id 1 Nombre: " + sensor.getTitulo());
 

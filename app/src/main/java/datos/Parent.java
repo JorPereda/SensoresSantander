@@ -1,11 +1,12 @@
 package datos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 //Clase para elemento padre en lista desplegable
-public  class Parent{
+public  class Parent implements Serializable {
 
     private static final AtomicInteger count = new AtomicInteger(0);
     private int idParent;

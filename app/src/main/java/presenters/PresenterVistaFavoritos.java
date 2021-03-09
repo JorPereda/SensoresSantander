@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import baseDeDatos.Medidas;
+import baseDeDatos.MedidasController;
 import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
@@ -217,6 +219,16 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
         Intent intentVistaAlarmas = new Intent(context, VistaAlarmas.class);
         mView.getActivityContext().startActivity(intentVistaAlarmas);
 
+    }
+
+    @Override
+    public void onClickAddRecogidaMedidas(SensorAmbiental sensor, int intervalo){
+        final Context context = mView.getActivityContext();
+        MedidasController mMedidasController = new MedidasController(context);
+
+        Medidas nuevaMedida = new Medidas();
+        nuevaMedida.setIntervalo(intervalo);
+        mMedidasController.nuevaMedida(nuevaMedida);
     }
 
     public void getListaSensores(){

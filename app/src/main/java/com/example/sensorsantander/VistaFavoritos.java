@@ -92,13 +92,13 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
             startService(serviceAlarmasIntent);
         }
 
-        /*serviceStats = new EstadisticasService();
+        serviceStats = new EstadisticasService();
         serviceStatsIntent = new Intent(this, serviceStats.getClass());
         if (!isMyServiceRunning(serviceStats.getClass())) {
             serviceStatsIntent.setAction(Intent.ACTION_VIEW);
             serviceStatsIntent.putExtra("parents", parents);
             startService(serviceStatsIntent);
-        }*/
+        }
 
     }
 

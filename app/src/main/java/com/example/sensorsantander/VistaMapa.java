@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import datos.SensorAmbiental;
 import presenters.PresenterVistaMapa;
@@ -141,9 +142,6 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
     @Override
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void dialogFiltrarFechas(){
-        long fechaDelCalendario;
-
-        final Integer[] fecha = new Integer[3];
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -158,6 +156,8 @@ public class VistaMapa extends AppCompatActivity  implements Interfaces_MVP.View
         final Button botonAceptar = customLayout.findViewById(R.id.button_ok_filtro_fecha);
 
         final TipoMapa tipo = new TipoMapa(sensorAmbList);
+
+        setSelectedDate(LocalDate.now());
 
         simpleCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
