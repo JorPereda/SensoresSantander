@@ -12,12 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -299,36 +301,55 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         botonNewStats.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String[] selectedItem = new String[1];
                 final AlertDialog.Builder builderGeneraStats = new AlertDialog.Builder(mView.getActivityContext());
+                View mViewDialog = LayoutInflater.from(v.getContext()).inflate(R.layout.conf_stats_dialog, null);
                 builderGeneraStats.setTitle("Generar estadisticas");
 
-                final String[] items = {"Cada hora", "Cada día"};
-                builderGeneraStats.setSingleChoiceItems(
-                        items,
-                        -1, // Index of checked item (-1 = no selection)
-                        new DialogInterface.OnClickListener() // Item click listener
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                selectedItem[0] = Arrays.asList(items).get(i);
+                final Spinner muestreo = (Spinner) mViewDialog.findViewById(R.id.spinnerMuestreo);
+                String[] muestreoList = new String[] {
+                        "5 minutos",
+                        "1 hora",
+                        "1 dia"
+                };
+                ArrayAdapter<String> dataAdapter1 = new ArrayAdapter(mView.getActivityContext(), android.R.layout.simple_spinner_item, muestreoList);
+                dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                muestreo.setAdapter(dataAdapter1);
 
-                            }
-                        });
+                final Spinner tiempoCalculo = (Spinner) mViewDialog.findViewById(R.id.spinnerCalculo);
+                String[] tiempoCalcList = new String[] {
+                        "1 hora",
+                        "1 dia",
+                        "1 semana"
+                };
+                ArrayAdapter<String> dataAdapter2 = new ArrayAdapter(mView.getActivityContext(), android.R.layout.simple_spinner_item, tiempoCalcList);
+                dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                tiempoCalculo.setAdapter(dataAdapter2);
+
+                final Spinner tiempoVida = (Spinner) mViewDialog.findViewById(R.id.spinnerTiempoVida);
+                String[] tVidaList = new String[] {
+                        "1 dia",
+                        "1 semana",
+                        "1 mes"
+                };
+                ArrayAdapter<String> dataAdapter3 = new ArrayAdapter(mView.getActivityContext(), android.R.layout.simple_spinner_item, tVidaList);
+                dataAdapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                tiempoVida.setAdapter(dataAdapter3);
+
+                builderGeneraStats.setView(mViewDialog);
+
+
 
                 builderGeneraStats.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast toast1 = Toast.makeText(mView.getActivityContext(),selectedItem[0], Toast.LENGTH_LONG);
-                        toast1.show();
-                        int intervalo = 0;
-                        if(selectedItem[0].equals("Cada hora")){
-                            intervalo = 1;
-                        }else if (selectedItem[0].equals("Cada día")){
-                            intervalo = 2;
-                        }
 
-                        child.setIntervaloStats(intervalo);
+                        int muestreoValor = (int) muestreo.getSelectedItemId();
+                        int tCalculoValor = (int) tiempoCalculo.getSelectedItemId();
+                        int tVidaValor = (int) tiempoVida.getSelectedItemId();
+
+                        child.setIntervaloStatsMuestreo(muestreoValor);
+                        child.setIntervaloStatsTCalculo(tCalculoValor);
+                        child.setIntervaloStatsTVida(tVidaValor);
                         setData(parents);
 
                         /*Intent intent = new Intent(mView.getActivityContext(), VistaStats.class);

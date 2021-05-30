@@ -12,7 +12,7 @@ public  class Parent implements Serializable {
     private int idParent;
     private String nombre;
     // ArrayList to store child objects
-    private ArrayList<SensorAmbiental> children = new ArrayList<SensorAmbiental>();
+    private ArrayList<SensorAmbiental> children = new ArrayList<>();
 
     public Parent(String nombre) {
         this.idParent = count.incrementAndGet();

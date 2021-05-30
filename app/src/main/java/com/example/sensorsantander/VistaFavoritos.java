@@ -2,12 +2,15 @@ package com.example.sensorsantander;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -30,12 +33,11 @@ import datos.VariablesGlobales;
 import presenters.PresenterVistaFavoritos;
 import adapters.CustomExpandableListAdapter;
 import services.AlarmasKeepRunningService;
-import services.AlarmsNotifService;
 import services.EstadisticasService;
-import services.RestarterAlarmas;
 import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
 import utilities.TinyDB;
+
 
 
 public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.ViewFavoritosYAlarma {
@@ -69,12 +71,16 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         setTheme(R.style.Theme_AppCompat_Light);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_favoritos);
+        //this.deleteDatabase(DATABASE_NAME);
 
         mPresenter = new PresenterVistaFavoritos(this);
         mPresenter.getListaSensores();
 
         TinyDB tinydb = new TinyDB(this);
+        //if(parents != null)
         parents = tinydb.getListParent("parents");
+
+        //if(listaAlarmas != null)
         listaAlarmas = tinydb.getListAlarmas("alarmas");
 
         expList = findViewById(R.id.list_view_favoritos);
@@ -84,22 +90,53 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
 
         refreshScreen();
 
-        serviceAlarmas = new AlarmasKeepRunningService();
-        serviceAlarmasIntent = new Intent(this, serviceAlarmas.getClass());
-        if (!isMyServiceRunning(serviceAlarmas.getClass())) {
+        //serviceAlarmas = new AlarmasKeepRunningService();
+        /*if (!isMyServiceRunning(serviceAlarmas.getClass())) {
+            serviceAlarmasIntent = new Intent(this, serviceAlarmas.getClass());
             serviceAlarmasIntent.setAction(Intent.ACTION_VIEW);
             serviceAlarmasIntent.putExtra("alarmas", listaAlarmas);
             startService(serviceAlarmasIntent);
-        }
+        }*/
 
-        serviceStats = new EstadisticasService();
-        serviceStatsIntent = new Intent(this, serviceStats.getClass());
-        if (!isMyServiceRunning(serviceStats.getClass())) {
+        //serviceStats = new EstadisticasService();
+        /*if (!isMyServiceRunning(serviceStats.getClass())) {
+            serviceStatsIntent = new Intent(this, serviceStats.getClass());
             serviceStatsIntent.setAction(Intent.ACTION_VIEW);
             serviceStatsIntent.putExtra("parents", parents);
             startService(serviceStatsIntent);
+        }*/
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        int parentsSize = sp.getInt("ParentsSize", 0);
+
+        serviceAlarmas = new AlarmasKeepRunningService();
+        runService(serviceAlarmas, "alarmas", listaAlarmas);
+
+        if(parents.size()>parentsSize){
+            Intent serviceIntent = new Intent(this, EstadisticasService.class);
+            stopService(serviceIntent);
+            serviceStats = new EstadisticasService();
+            runService(serviceStats, "parents", parents);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("ParentsSize", parents.size());
+            editor.apply();
         }
 
+    }
+
+    @Override
+    public void runService(Service service, String intentString, ArrayList intentList){
+        if (!isMyServiceRunning(service.getClass())) {
+            Intent serviceIntent = new Intent(this, service.getClass());
+            serviceIntent.setAction(Intent.ACTION_VIEW);
+            serviceIntent.putExtra(intentString, intentList);
+            startService(serviceIntent);
+        }
+    }
+
+    @Override
+    public void stopServicioStats(){
+        stopService(new Intent(this, EstadisticasService.class));
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -107,35 +144,15 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         assert manager != null;
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("Service status", "Running");
+                Log.i ("Service status", "Running " + service.getClass().toString());
                 return true;
             }
         }
-        Log.i ("Service status", "Not running");
+        Log.i ("Service status", "Not running " + serviceClass.toString());
         return false;
     }
 
-    /*@Override
-    protected void onDestroy() {
-        //stopService(mServiceIntent);
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("restartservice");
-        broadcastIntent.setClass(this, RestarterAlarmas.class);
-        this.sendBroadcast(broadcastIntent);
-        super.onDestroy();
-    }*/
-
-    /*@Override
-    public void onStartService() {
-        Intent i = new Intent(getBaseContext(), AlarmsNotifService.class);
-        i.setAction(Intent.ACTION_VIEW);
-        i.putExtra("alarmas", listaAlarmas);
-        if(!(isMyServiceRunning(AlarmsNotifService.class))){
-            startService(i);
-        }
-    }*/
-
-    private BroadcastReceiver testReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Alarma> listaAlarmas;
@@ -145,6 +162,17 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
                 //Toast.makeText(VistaFavoritos.this, String.valueOf(listaAlarmas.size()), Toast.LENGTH_SHORT).show();
                 //Toast.makeText(VistaFavoritos.this, String.valueOf(listaAlarmas.get(1).getAlarmasRegistradas().size()), Toast.LENGTH_SHORT).show();
                 updateListAlarmas(listaAlarmas);
+            }
+        }
+    };
+
+    private BroadcastReceiver statsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int resultCode = intent.getIntExtra("resultCodeStats", Activity.RESULT_OK);
+            if (resultCode == RESULT_OK) {
+                updateListParents((ArrayList<Parent>) intent.getSerializableExtra("parentsResult"));
+                Log.d("Estadisticas ", "Servicio Stats Ok");
             }
         }
     };
@@ -235,6 +263,12 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         TinyDB tinydb = new TinyDB(this);
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
+
+        serviceAlarmas = new AlarmasKeepRunningService();
+        runService(serviceAlarmas, "alarmas", listaAlarmas);
+
+        //serviceStats = new EstadisticasService();
+        //runService(serviceStats, "parents", parents);
     }
 
     @Override
@@ -244,10 +278,21 @@ public class VistaFavoritos extends AppCompatActivity implements Interfaces_MVP.
         VariablesGlobales.nombreGrupos = tinydb.getListString("nombreGrupos");
         parents = tinydb.getListParent("parents");
 
-        tinydb.putListAlarmas("alarmas", listaAlarmas);
+        if(listaAlarmas!=null){
+            tinydb.putListAlarmas("alarmas", listaAlarmas);
+        }
 
-        IntentFilter filter = new IntentFilter(AlarmsNotifService.ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(testReceiver, filter);
+        serviceAlarmas = new AlarmasKeepRunningService();
+        runService(serviceAlarmas, "alarmas", listaAlarmas);
+
+        //serviceStats = new EstadisticasService();
+        //runService(serviceStats, "parents", parents);
+
+        IntentFilter filterAlarm = new IntentFilter(AlarmasKeepRunningService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(alarmReceiver, filterAlarm);
+
+        IntentFilter filterStats = new IntentFilter(EstadisticasService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(statsReceiver, filterStats);
     }
 
     @Override

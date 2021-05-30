@@ -11,6 +11,7 @@ public class Medidas {
 
     private Integer idSensor;
     private String fecha;
+    private String fechaCortada;
     private String temp;
     private String ruido;
     private String luz;
@@ -20,19 +21,21 @@ public class Medidas {
     public Medidas(){
     }
 
-    public Medidas(Integer idSensor, String fecha, String temp, String ruido, String luz) {
+    public Medidas(Integer idSensor, String fecha, String fechaCortada, String temp, String ruido, String luz) {
         //this.id = id;
         this.idSensor = idSensor;
         this.fecha = fecha;
+        this.fechaCortada = fechaCortada;
         this.temp = temp;
         this.ruido = ruido;
         this.luz = luz;
     }
 
-    public Medidas(long id, Integer idSensor, String fecha, String temp, String ruido, String luz) {
+    public Medidas(long id, Integer idSensor, String fecha, String fechaCortada, String temp, String ruido, String luz) {
         this.id = id;
         this.idSensor = idSensor;
         this.fecha = fecha;
+        this.fechaCortada = fechaCortada;
         this.temp = temp;
         this.ruido = ruido;
         this.luz = luz;
@@ -66,6 +69,14 @@ public class Medidas {
         this.fecha = fecha;
     }
 
+    public String getFechaCortada() {
+        return fechaCortada;
+    }
+
+    public void setFechaCortada(String fechaCortada) {
+        this.fechaCortada = fechaCortada;
+    }
+
     public void setTemp(String temp) {
         this.temp = temp;
     }
@@ -83,6 +94,7 @@ public class Medidas {
         values.put(EstadisticasContract.MedidasSensorEntry.ID, id);
         values.put(EstadisticasContract.MedidasSensorEntry.ID_SENSOR, idSensor);
         values.put(EstadisticasContract.MedidasSensorEntry.FECHA, fecha);
+        values.put(EstadisticasContract.MedidasSensorEntry.FECHACORTADA, fechaCortada);
         values.put(EstadisticasContract.MedidasSensorEntry.TEMP, temp);
         values.put(EstadisticasContract.MedidasSensorEntry.RUIDO, ruido);
         values.put(EstadisticasContract.MedidasSensorEntry.LUZ, luz);

@@ -18,7 +18,9 @@ public class SensorAmbiental implements Serializable {
     private String titulo;
     private String direccion;
 
-    private int intervaloStats;
+    private int intervaloStatsMuestreo;
+    private int intervaloStatsTCalculo;
+    private int intervaloStatsTVida;
 
     public SensorAmbiental(){
 
@@ -37,7 +39,9 @@ public class SensorAmbiental implements Serializable {
         this.longitud = longitud;
         this.ultModificacion = ultModificacion;
         this.uri = uri;
-        this.intervaloStats = 0;
+        this.intervaloStatsMuestreo = 0;
+        this.intervaloStatsTCalculo = 0;
+        this.intervaloStatsTVida = 0;
     }
 
     public String getIdentificador() {
@@ -136,11 +140,27 @@ public class SensorAmbiental implements Serializable {
         this.direccion = direccion;
     }
 
-    public int getIntervaloStats() {
-        return intervaloStats;
+    public int getIntervaloStatsMuestreo() {
+        return intervaloStatsMuestreo;
     }
 
-    public void setIntervaloStats(int intervaloStats) {
-        this.intervaloStats = intervaloStats;
+    public void setIntervaloStatsMuestreo(int intervaloStatsMuestreo) {
+        this.intervaloStatsMuestreo = intervaloStatsMuestreo;
+    }
+
+    public int getIntervaloStatsTCalculo() {
+        return intervaloStatsTCalculo;
+    }
+
+    public void setIntervaloStatsTCalculo(int intervaloStatsTCalculo) {
+        this.intervaloStatsTCalculo = intervaloStatsTCalculo;
+    }
+
+    public int getIntervaloStatsTVida() {
+        return intervaloStatsTVida;
+    }
+
+    public void setIntervaloStatsTVida(int intervaloStatsTVida) {
+        this.intervaloStatsTVida = intervaloStatsTVida;
     }
 }

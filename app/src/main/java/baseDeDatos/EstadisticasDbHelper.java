@@ -14,6 +14,7 @@ public class EstadisticasDbHelper extends SQLiteOpenHelper {
             + EstadisticasContract.MedidasSensorEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + EstadisticasContract.MedidasSensorEntry.ID_SENSOR + " INTEGER NOT NULL,"
             + EstadisticasContract.MedidasSensorEntry.FECHA + " TEXT,"
+            + EstadisticasContract.MedidasSensorEntry.FECHACORTADA + " TEXT,"
             + EstadisticasContract.MedidasSensorEntry.TEMP + " TEXT,"
             + EstadisticasContract.MedidasSensorEntry.RUIDO + " TEXT,"
             + EstadisticasContract.MedidasSensorEntry.LUZ + " TEXT)";
@@ -39,12 +40,12 @@ public class EstadisticasDbHelper extends SQLiteOpenHelper {
 
     //Mocks para introducir datos de prueba
     private void mockData(SQLiteDatabase sqLiteDatabase) {
-        mockMedidas(sqLiteDatabase, new Medidas(1, 1, "10/02/2021","20","", "0"));
-        mockMedidas(sqLiteDatabase, new Medidas(2, 1, "10/02/2021","25","", "0"));
-        mockMedidas(sqLiteDatabase, new Medidas(3, 1, "10/02/2021","28","", "0"));
-        mockMedidas(sqLiteDatabase, new Medidas(4, 2, "10/02/2021","","70", ""));
-        mockMedidas(sqLiteDatabase, new Medidas(5, 2, "10/02/2021","","80", ""));
-        mockMedidas(sqLiteDatabase, new Medidas(6, 2, "10/02/2021","","90", ""));
+        mockMedidas(sqLiteDatabase, new Medidas(1, 1, "10/02/2021","10/02/2021","20","", "0"));
+        mockMedidas(sqLiteDatabase, new Medidas(2, 1, "10/02/2021","10/02/2021","25","", "0"));
+        mockMedidas(sqLiteDatabase, new Medidas(3, 1, "10/02/2021","10/02/2021","28","", "0"));
+        mockMedidas(sqLiteDatabase, new Medidas(4, 2, "10/02/2021","10/02/2021","","70", ""));
+        mockMedidas(sqLiteDatabase, new Medidas(5, 2, "10/02/2021","10/02/2021","","80", ""));
+        mockMedidas(sqLiteDatabase, new Medidas(6, 2, "10/02/2021","10/02/2021","","90", ""));
     }
 
 

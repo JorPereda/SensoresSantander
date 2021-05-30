@@ -1,5 +1,6 @@
 package com.example.sensorsantander;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -106,6 +107,16 @@ public class VistaAlarmas extends AppCompatActivity implements Interfaces_MVP.Vi
 
     @Override
     public void actionModeEditar(int groupPosition) {
+
+    }
+
+    @Override
+    public void runService(Service service, String intentString, ArrayList intentList) {
+
+    }
+
+    @Override
+    public void stopServicioStats() {
 
     }
 

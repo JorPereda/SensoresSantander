@@ -41,12 +41,12 @@ import datos.SensorAmbiental;
 import utilities.HttpHandler;
 import utilities.TinyDB;
 
-import static services.AlarmsNotifService.ACTION;
-
 public class AlarmasKeepRunningService extends Service {
 
+    public static final String ACTION = "services.AlarmasKeepRunningService";
+
     public Context context;
-    public ArrayList<Alarma> listaAlarmas;
+    public ArrayList<Alarma> listaAlarmas = new ArrayList<>();
 
 
     @Override
@@ -85,9 +85,8 @@ public class AlarmasKeepRunningService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        //if(listaAlarmas==null){
+        if(listaAlarmas!=null)
             listaAlarmas = (ArrayList<Alarma>) intent.getSerializableExtra("alarmas");
-        //}
 
         startTimer();
         return START_STICKY;

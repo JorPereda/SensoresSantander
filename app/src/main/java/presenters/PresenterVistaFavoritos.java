@@ -1,6 +1,8 @@
 package presenters;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +29,7 @@ import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import datos.VariablesGlobales;
+import services.EstadisticasService;
 import tasks.GetDataTotalTask;
 import tasks.UpdateFavoritosTask;
 import utilities.Interfaces_MVP;
@@ -155,7 +158,6 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
 
     @Override
     public void onClickAddFavorito(final SensorAmbiental sensor, final String grupo){
-
         TinyDB tinydb = new TinyDB(mView.getAppContext());
         parents = tinydb.getListParent("parents");
 
@@ -174,6 +176,8 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
             public void onClick(DialogInterface dialog, int which) {
                 String m_Text = inputSensor.getText().toString();
                 sensor.setTitulo(m_Text);
+
+                //mView.stopServicioStats();
 
                 for (Parent p : parents){
                     if(p.getNombre().equals(grupo)){
@@ -194,11 +198,7 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
                 dialog.cancel();
             }
         });
-
         builder.show();
-
-
-
     }
 
     @Override
@@ -215,10 +215,8 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
 
         new GetSensorUnicoTask(nuevaAlarma, alarmas, mView).execute();
 
-
         Intent intentVistaAlarmas = new Intent(context, VistaAlarmas.class);
         mView.getActivityContext().startActivity(intentVistaAlarmas);
-
     }
 
     @Override
@@ -234,6 +232,5 @@ public class PresenterVistaFavoritos implements Interfaces_MVP.PresenterFavorito
     public void getListaSensores(){
         new GetDataTotalTask(mView).execute();
     }
-
 
 }

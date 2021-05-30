@@ -8,11 +8,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.hardware.Sensor;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -26,32 +24,33 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import baseDeDatos.Medidas;
 import baseDeDatos.MedidasController;
-import datos.Alarma;
 import datos.Parent;
 import datos.SensorAmbiental;
 import utilities.HttpHandler;
-
-import static services.AlarmsNotifService.ACTION;
+import utilities.TinyDB;
 
 public class EstadisticasService extends Service {
 
+    public static final String ACTION = "services.EstadisticasService";
+
     public Context context;
-    private ArrayList<Parent> parents;
-    private SensorAmbiental sensor = new SensorAmbiental();
+    private ArrayList<Parent> parents = new ArrayList<>();
+    //private SensorAmbiental sensor = new SensorAmbiental();
     private MedidasController medidasController;
 
     @Override
     public void onCreate(){
         super.onCreate();
         context = getApplicationContext();
+        Log.d("EstadisticasService ", "OnCreate: antes de operaciones");
+
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
@@ -86,16 +85,12 @@ public class EstadisticasService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        //parents = (ArrayList<Parent>) intent.getSerializableExtra("parents");
 
-        /*sensor = (SensorAmbiental) intent.getSerializableExtra("sensor");
-        assert sensor != null;
-        intervalo = sensor.getIntervaloStats();
-        Log.d("EstadisticasService ", "SensorIntent: " + sensor.getIdentificador() + " " + sensor.getTitulo());*/
-
-
-        parents = (ArrayList<Parent>) intent.getSerializableExtra("parents");
+        Log.d("EstadisticasService ", "StartCommand: antes de operaciones");
 
         startTimer();
+
         return START_STICKY;
     }
 
@@ -103,31 +98,44 @@ public class EstadisticasService extends Service {
     private TimerTask timerTask;
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void startTimer() {
-        for(Parent p : parents){
-            for(final SensorAmbiental sensor : p.getChildren()){
-                //Intervalo 0 -> horas   1 -> dias
-                int intervalo = sensor.getIntervaloStats();
-                timer = new Timer();
-                timerTask = new TimerTask() {
-                    public void run() {
-                        updateSensor();
+        Log.d("EstadisticasService ", "StartTimer: antes de operaciones");
+
+        //Intervalo 0 -> horas   1 -> dias
+        final int[] intervaloMuestreo = new int[1];
+        timer = new Timer();
+        timerTask = new TimerTask() {
+            public void run() {
+                TinyDB tinydb = new TinyDB(getBaseContext());
+                parents = tinydb.getListParent("parents");
+                for(Parent p : parents) {
+                    for (SensorAmbiental sensor : p.getChildren()) {
+                        Log.d("EstadisticasService", "SensorTimer: " + "La ejecucion entra en el bucle de sensores");
+                        intervaloMuestreo[0] = sensor.getIntervaloStatsMuestreo();
+                        updateSensor(sensor);
                         recogeStats(sensor);
-                        Log.d("EstadisticasService ", "SensorTimer: " + sensor.getIdentificador() + " " + sensor.getTitulo());
+                        Log.d("EstadisticasService ", "SensorTimer: " + sensor.getIdentificador() + " " + sensor.getTitulo() + " Temp: " + sensor.getTemperatura());
                     }
-                };
-                if(intervalo ==1){
-                    //timer.schedule(timerTask, 1000, 3600000); //1 hora
-                    timer.schedule(timerTask, 1000, 300000); //5 min
-                }
-                if(intervalo ==2){
-                    timer.schedule(timerTask, 1000, 86400000); //1 dia
                 }
             }
+        };
+        if(intervaloMuestreo[0] ==0){
+            timer.schedule(timerTask, 0, 300000); //5 min
+            //timer.schedule(timerTask, 1000, 10000); //1 minuto
+            //Log.d("EstadisticasService ", "Muestreo del sensor " + sensor.getIdentificador() + " " + sensor.getTitulo());
+        }
+        if(intervaloMuestreo[0] ==1){
+            timer.schedule(timerTask, 0, 3600000); //1 hora
+            //Log.d("EstadisticasService ", "Muestreo del sensor 1 hora " + sensor.getIdentificador() + " " + sensor.getTitulo());
+
+        }
+        if(intervaloMuestreo[0] ==2){
+            timer.schedule(timerTask, 0, 86400000); //1 dia
         }
 
 
         Intent inResult = new Intent(ACTION);
-        inResult.putExtra("resultCode", Activity.RESULT_OK);
+        inResult.putExtra("resultCodeStats", Activity.RESULT_OK);
+        inResult.putExtra("parentsResult", parents);
         LocalBroadcastManager.getInstance(this).sendBroadcast(inResult);
     }
 
@@ -138,14 +146,16 @@ public class EstadisticasService extends Service {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void recogeStats(SensorAmbiental sensor){
-        Date currentTime = Calendar.getInstance().getTime();
-        Medidas medidaNueva = new Medidas(Integer.valueOf(sensor.getIdentificador()), String.valueOf(currentTime), sensor.getTemperatura(), sensor.getRuido(), sensor.getLuminosidad());
-        //Medidas medidaNueva = new Medidas(2077, String.valueOf(currentTime), "8", "8", "8");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String fechaCortada = currentTime.toString().substring(0,13);
+        Medidas medidaNueva = new Medidas(Integer.valueOf(sensor.getIdentificador()), String.valueOf(currentTime), fechaCortada, sensor.getTemperatura(), sensor.getRuido(), sensor.getLuminosidad());
         long id = medidasController.nuevaMedida(medidaNueva);
         if (id == -1) {
             // De alguna manera ocurrió un error
-            Toast.makeText(context, "Error al guardar. Intenta de nuevo", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Error al guardar. Intenta de nuevo", Toast.LENGTH_SHORT).show();
+            Log.d("EstadisticasService ", "Error al guardar. Intenta de nuevo");
         }
     }
 
@@ -160,7 +170,7 @@ public class EstadisticasService extends Service {
         this.sendBroadcast(broadcastIntent);
     }
 
-    private void updateSensor(){
+    private void updateSensor(SensorAmbiental sensor){
         HttpHandler sh = new HttpHandler();
 
         String url = sensor.getUri();
@@ -200,6 +210,16 @@ public class EstadisticasService extends Service {
                         Log.e(tag, "- Temp: " + temperatura);
 
                     }
+
+                    /*for(Parent p : parents){
+                        ArrayList<SensorAmbiental> listaActualizada = p.getChildren();
+                        for(int i = 0; i < p.getChildren().size(); i++){
+                            if(p.getChild(i).getIdentificador().equals(sensor.getIdentificador())){
+                                listaActualizada.set(i, sensor);
+                                p.setChildren(listaActualizada);
+                            }
+                        }
+                    }*/
                 } catch (final JSONException e) {
                     Log.e(tag, "Json parsing error: " + e.getMessage());
                 }

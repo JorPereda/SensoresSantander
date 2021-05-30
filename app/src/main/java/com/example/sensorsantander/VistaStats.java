@@ -3,43 +3,34 @@ package com.example.sensorsantander;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import adapters.MedidasCursorAdapter;
-import baseDeDatos.EstadisticasContract;
-import baseDeDatos.EstadisticasDbHelper;
 import baseDeDatos.Medidas;
 import baseDeDatos.MedidasController;
 import datos.SensorAmbiental;
-import presenters.PresenterVistaAlarmas;
-import presenters.PresenterVistaOthers;
-import services.AlarmasKeepRunningService;
-import services.EstadisticasService;
+import presenters.PresenterVistaStats;
 import utilities.Interfaces_MVP;
 
-public class VistaStats extends AppCompatActivity implements Interfaces_MVP.ViewOthers{
+public class VistaStats extends AppCompatActivity implements Interfaces_MVP.ViewStats {
 
-    private static Interfaces_MVP.PresenterOthers mPresenter;
+    private static Interfaces_MVP.PresenterStats mPresenter;
 
     private SensorAmbiental sensor;
 
@@ -48,99 +39,79 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
     private ArrayList<Double> ruidos = new ArrayList<>();
     private ArrayList<Double> luminosidades = new ArrayList<>();
 
-    Intent serviceStatsIntent;
-    private EstadisticasService serviceStats;
-    private int intervalo;
+    private TextView tvTempMedia;
+    private TextView tvTempMediana;
+    private TextView tvTempMax;
+    private TextView tvTempMin;
+    private TextView tvTempDesv;
+    private TextView tvTipo;
 
+    private Median mediana;
+    private DescriptiveStatistics tempStats;
+    private DescriptiveStatistics ruidoStats;
+    private DescriptiveStatistics luzStats;
+
+    private String tipoMostrado = "Temperatura";
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_stats);
 
-        mPresenter = new PresenterVistaOthers(this);
+        mPresenter = new PresenterVistaStats(this);
         mMedidasController = new MedidasController(this);
 
         Intent intent = getIntent();
         sensor = (SensorAmbiental) intent.getSerializableExtra("sensor");
-        assert sensor != null;
-        intervalo = sensor.getIntervaloStats();
         Log.d("VistaEstadisticas ", "SensorStats: " + sensor.getIdentificador() + " " + sensor.getTitulo());
 
-
-        if (sensor != null) {
-            temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensor(sensor.getIdentificador()));
-            ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensor(sensor.getIdentificador()));
-            luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensor(sensor.getIdentificador()));
-            //temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensor("1"));
-            //ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensor("1"));
-            //luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensor("1"));
+        int tiempoCalculo = sensor.getIntervaloStatsTCalculo();
+        LocalDateTime currentTime = LocalDateTime.now();
+        String fechaHastaHora = currentTime.toString().substring(0,13);
+        String fechaHastaDia = currentTime.toString().substring(0,10);
+        String fechaHastaSemana = currentTime.minusWeeks(1).toString().substring(0,13);
+        //0 = 1 hora
+        if(tiempoCalculo==0){
+            temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensorFecha(sensor.getIdentificador(), fechaHastaHora));
+            ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensorFecha(sensor.getIdentificador(), fechaHastaHora));
+            luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensorFecha(sensor.getIdentificador(), fechaHastaHora));
+        }
+        //1 = 1 dia
+        if(tiempoCalculo==1){
+            temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensorFecha(sensor.getIdentificador(), fechaHastaDia));
+            ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensorFecha(sensor.getIdentificador(), fechaHastaDia));
+            luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensorFecha(sensor.getIdentificador(), fechaHastaDia));
+        }
+        //2 = 1 semana
+        if(tiempoCalculo==2){
+            temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensorFecha(sensor.getIdentificador(), fechaHastaSemana));
+            ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensorFecha(sensor.getIdentificador(), fechaHastaSemana));
+            luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensorFecha(sensor.getIdentificador(), fechaHastaSemana));
         }
 
-        DescriptiveStatistics tempStats = new DescriptiveStatistics();
-        DescriptiveStatistics ruidoStats = new DescriptiveStatistics();
-        DescriptiveStatistics luzStats = new DescriptiveStatistics();
-        Median mediana = new Median();
+        /*temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensor(sensor.getIdentificador()));
+        ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensor(sensor.getIdentificador()));
+        luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensor(sensor.getIdentificador()));*/
 
-        for(Double d : temperaturas){
-            tempStats.addValue(d);
-        }
-        for(Double d : ruidos){
-            ruidoStats.addValue(d);
-        }
-        for(Double d : luminosidades){
-            luzStats.addValue(d);
-        }
+        mediana = new Median();
+        tempStats = new DescriptiveStatistics();
+        ruidoStats = new DescriptiveStatistics();
+        luzStats = new DescriptiveStatistics();
 
         TextView tvSensor = findViewById(R.id.tvStatsName);
+        tvTipo = findViewById(R.id.tvTipoSensorStats);
 
-        TextView tvTempMedia = findViewById(R.id.tvTempMediaValor);
-        TextView tvTempMediana = findViewById(R.id.tvTempMedianaValor);
-        TextView tvTempMax = findViewById(R.id.tvTempMaxValor);
-        TextView tvTempMin = findViewById(R.id.tvTempMinValor);
-        TextView tvTempDesv = findViewById(R.id.tvTempDesvValor);
-
-        TextView tvRuidoMedia = findViewById(R.id.tvRuidoMediaValor);
-        TextView tvRuidoMediana = findViewById(R.id.tvRuidoMedianaValor);
-        TextView tvRuidoMax = findViewById(R.id.tvRuidoMaxValor);
-        TextView tvRuidoMin = findViewById(R.id.tvRuidoMinValor);
-        TextView tvRuidoDesv = findViewById(R.id.tvRuidoDesvValor);
-
-        TextView tvLuzMedia = findViewById(R.id.tvLuzMediaValor);
-        TextView tvLuzMediana = findViewById(R.id.tvLuzMedianaValor);
-        TextView tvLuzMax = findViewById(R.id.tvLuzMaxValor);
-        TextView tvLuzMin = findViewById(R.id.tvLuzMinValor);
-        TextView tvLuzDesv = findViewById(R.id.tvLuzDesvValor);
+        tvTempMedia = findViewById(R.id.tvTempMediaValor);
+        tvTempMediana = findViewById(R.id.tvTempMedianaValor);
+        tvTempMax = findViewById(R.id.tvTempMaxValor);
+        tvTempMin = findViewById(R.id.tvTempMinValor);
+        tvTempDesv = findViewById(R.id.tvTempDesvValor);
 
         tvSensor.setText(sensor.getTitulo());
-
-        tvTempMedia.setText(String.valueOf(tempStats.getMean()));
-        tvTempMediana.setText(String.valueOf(mediana.evaluate(tempStats.getValues())));
-        tvTempMax.setText(String.valueOf(tempStats.getMax()));
-        tvTempMin.setText(String.valueOf(tempStats.getMin()));
-        tvTempDesv.setText(String.valueOf(tempStats.getStandardDeviation()));
-
-        tvRuidoMedia.setText(String.valueOf(ruidoStats.getMean()));
-        tvRuidoMediana.setText(String.valueOf(mediana.evaluate(ruidoStats.getValues())));
-        tvRuidoMax.setText(String.valueOf(ruidoStats.getMax()));
-        tvRuidoMin.setText(String.valueOf(ruidoStats.getMin()));
-        tvRuidoDesv.setText(String.valueOf(ruidoStats.getStandardDeviation()));
-
-        tvLuzMedia.setText(String.valueOf(luzStats.getMean()));
-        tvLuzMediana.setText(String.valueOf(mediana.evaluate(luzStats.getValues())));
-        tvLuzMax.setText(String.valueOf(luzStats.getMax()));
-        tvLuzMin.setText(String.valueOf(luzStats.getMin()));
-        tvLuzDesv.setText(String.valueOf(luzStats.getStandardDeviation()));
+        calculos(tipoMostrado);
 
         Log.d("VistaStats ", "Medidas id 1 Nombre: " + sensor.getTitulo());
-
-        serviceStats = new EstadisticasService();
-        serviceStatsIntent = new Intent(this, serviceStats.getClass());
-        if (!isMyServiceRunning(serviceStats.getClass())) {
-            serviceStatsIntent.setAction(Intent.ACTION_VIEW);
-            serviceStatsIntent.putExtra("Intervalo", intervalo);
-            serviceStatsIntent.putExtra("sensor", sensor);
-            startService(serviceStatsIntent);
-        }
 
         ArrayList<Medidas> medidasTotales = mMedidasController.obtenerMedidasTotales();
         for(Medidas m : medidasTotales){
@@ -150,6 +121,59 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
             Log.d("VistaEstadisticas ", "Medidas ruido: " + m.getRuido());
             Log.d("VistaEstadisticas ", "Medidas luz: " + m.getLuz());
             Log.d("VistaEstadisticas ", "Medidas fecha: " + m.getFecha());
+            Log.d("VistaEstadisticas ", "Medidas fecha cortada: " + m.getFechaCortada());
+        }
+        Log.d("VistaEstadisticas ", "size 1: " + mMedidasController.obtenerTemperaturasSensor(sensor.getIdentificador()).size());
+
+
+        limpieza();
+
+    }
+
+    public void calculos(String tipo){
+        Log.d("VistaEstadisticas ", "size 2: " + mMedidasController.obtenerTemperaturasSensor(sensor.getIdentificador()).size());
+        Log.d("VistaEstadisticas ", "temp size 2: " + temperaturas.size());
+
+        switch (tipo){
+            case "Temperatura":
+                temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensor(sensor.getIdentificador()));
+
+
+                for(Double d : temperaturas){
+                    tempStats.addValue(d);
+                    tvTempMedia.setText(String.valueOf(tempStats.getMean()));
+                    tvTempMediana.setText(String.valueOf(mediana.evaluate(tempStats.getValues())));
+                    tvTempMax.setText(String.valueOf(tempStats.getMax()));
+                    tvTempMin.setText(String.valueOf(tempStats.getMin()));
+                    tvTempDesv.setText(String.valueOf(tempStats.getStandardDeviation()));
+                    tvTipo.setText(tipo);
+                    Log.d("VistaEstadisticas ", "tempStats: " + d.toString());
+                }
+                break;
+            case "Ruido":
+                ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensor(sensor.getIdentificador()));
+                for(Double d : ruidos){
+                    ruidoStats.addValue(d);
+                    tvTempMedia.setText(String.valueOf(ruidoStats.getMean()));
+                    tvTempMediana.setText(String.valueOf(mediana.evaluate(ruidoStats.getValues())));
+                    tvTempMax.setText(String.valueOf(ruidoStats.getMax()));
+                    tvTempMin.setText(String.valueOf(ruidoStats.getMin()));
+                    tvTempDesv.setText(String.valueOf(ruidoStats.getStandardDeviation()));
+                    tvTipo.setText(tipo);
+                }
+                break;
+            case "Luz":
+                luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensor(sensor.getIdentificador()));
+                for(Double d : luminosidades){
+                    luzStats.addValue(d);
+                    tvTempMedia.setText(String.valueOf(luzStats.getMean()));
+                    tvTempMediana.setText(String.valueOf(mediana.evaluate(luzStats.getValues())));
+                    tvTempMax.setText(String.valueOf(luzStats.getMax()));
+                    tvTempMin.setText(String.valueOf(luzStats.getMin()));
+                    tvTempDesv.setText(String.valueOf(luzStats.getStandardDeviation()));
+                    tvTipo.setText(tipo);
+                }
+                break;
         }
 
     }
@@ -173,23 +197,38 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
         else return 0;
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        assert manager != null;
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("Service status", "Running");
-                return true;
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void limpieza(){
+
+        int intervaloLimpieza = sensor.getIntervaloStatsTVida();
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        ArrayList<Medidas> medidasTotales = mMedidasController.obtenerMedidasTotales();
+        for(Medidas m : medidasTotales) {
+            LocalDateTime fechaSensor = LocalDateTime.parse(m.getFecha());
+            if (intervaloLimpieza == 0) {
+                if (fechaSensor.isBefore(currentTime.minusDays(1))) {
+                    mMedidasController.eliminarMedida(m);
+                }
+            }
+            if (intervaloLimpieza == 1) {
+                if (fechaSensor.isBefore(currentTime.minusWeeks(1))) {
+                    mMedidasController.eliminarMedida(m);
+                }
+            }
+            if (intervaloLimpieza == 2) {
+                if (fechaSensor.isBefore(currentTime.minusMonths(1))) {
+                    mMedidasController.eliminarMedida(m);
+                }
             }
         }
-        Log.i ("Service status", "Not running");
-        return false;
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_alarmas, menu);
+        getMenuInflater().inflate(R.menu.menu_stats, menu);
         return true;
     }
 
@@ -197,6 +236,19 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
     public boolean onOptionsItemSelected(MenuItem item) {
         return mPresenter.menu(item);
     }
+
+    @Override
+    public void seleccionarTipoAMostrar(String tipo) {
+        this.tipoMostrado = tipo;
+        calculos(tipo);
+    }
+
+    /*@Override
+    public void filtrarResultFecha() {
+        temperaturas = convertirArraytoDouble(mMedidasController.obtenerTemperaturasSensorFecha(sensor.getIdentificador()));
+        ruidos = convertirArraytoDouble(mMedidasController.obtenerRuidoSensorFecha(sensor.getIdentificador()));
+        luminosidades = convertirArraytoDouble(mMedidasController.obtenerLuzSensorFecha(sensor.getIdentificador()));
+    }*/
 
     @Override
     public Context getAppContext() {
@@ -207,4 +259,7 @@ public class VistaStats extends AppCompatActivity implements Interfaces_MVP.View
     public Context getActivityContext() {
         return this;
     }
+
+
+
 }

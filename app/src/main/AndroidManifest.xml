@@ -95,10 +95,6 @@
             android:value="AIzaSyBJt3UpCPT7BM4gLZBP-JOZKiC2NQTgQh0"/>
 
 
-        <service android:name="services.AlarmsNotifService"
-            android:exported="false"
-            android:icon="@mipmap/sensoricon"/>
-
         <receiver
             android:name="services.RestarterAlarmas"
             android:enabled="true"

@@ -1,6 +1,7 @@
 package utilities;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
@@ -47,7 +48,7 @@ public interface Interfaces_MVP {
         boolean menuAlarmas(MenuItem item);
     }
 
-    interface PresenterOthers {
+    interface PresenterStats {
         boolean menu(MenuItem item);
     }
 
@@ -61,6 +62,9 @@ public interface Interfaces_MVP {
         PresenterVistaFavoritos getPresenter();
 
         void actionModeEditar(int groupPosition);
+
+        void runService(Service service, String intentString, ArrayList intentList);
+        void stopServicioStats();
         ExpandableListView getExpList();
 
         //void onStartService();
@@ -83,7 +87,8 @@ public interface Interfaces_MVP {
         Context getActivityContext();
     }
 
-    interface ViewOthers{
+    interface ViewStats {
+        void seleccionarTipoAMostrar(String tipo);
         Context getAppContext();
         Context getActivityContext();
     }
